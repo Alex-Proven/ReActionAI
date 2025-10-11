@@ -1,0 +1,1 @@
+namespace ReActionAI.CTO { public interface IActionPlan { } public interface IOrchestrator { IActionPlan BuildPlan(string prompt); } }

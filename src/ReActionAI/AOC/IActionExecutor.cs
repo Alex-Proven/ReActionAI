@@ -1,0 +1,1 @@
+namespace ReActionAI.AOC { public interface IActionExecutor { void Execute(string planJson); } }

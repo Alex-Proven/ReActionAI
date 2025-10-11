@@ -1,0 +1,1 @@
+namespace ReActionAI.HIC { public interface IUserIntentDetector { string Detect(string text); } }

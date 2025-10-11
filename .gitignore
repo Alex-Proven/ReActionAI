@@ -1,0 +1,20 @@
+
+# Build results
+bin/
+obj/
+[Bb]uild/
+# VS
+.vs/
+*.user
+*.suo
+*.userprefs
+# Packages
+packages/
+*.nupkg
+# Logs
+*.log
+# Rider/JetBrains
+.idea/
+# OS
+.DS_Store
+Thumbs.db

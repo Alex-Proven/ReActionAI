@@ -1,0 +1,1 @@
+namespace ReActionAI.KB { public interface IRagStore { void Index(string text, string? id = null); string Query(string query, int topK = 5); } }

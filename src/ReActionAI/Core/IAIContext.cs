@@ -1,0 +1,1 @@
+namespace ReActionAI.Core { public interface IAIContext { } }

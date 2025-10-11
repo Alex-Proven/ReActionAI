@@ -1,0 +1,1 @@
+namespace ReActionAI.Modules { public interface IModule { string Id { get; } void Initialize(); } }
