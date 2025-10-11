@@ -1,12 +1,63 @@
+# .editorconfig — единые правила форматирования проекта ReActionAI
+# Подробнее: https://learn.microsoft.com/visualstudio/ide/editorconfig-code-style-settings
 
 root = true
+
+##########################
+# Общие настройки
+##########################
 
 [*]
 charset = utf-8
 end_of_line = crlf
 insert_final_newline = true
+trim_trailing_whitespace = true
+
+##########################
+# Windows / .NET файлы
+##########################
+
+[*.{cs,xaml,csproj,sln,ps1,bat,cmd,config}]
+end_of_line = crlf
 indent_style = space
 indent_size = 4
 
-[*.{yml,yaml,json,md}]
+##########################
+# Кроссплатформенные / CI файлы
+##########################
+
+[*.{sh,yml,yaml,json,md,txt}]
+end_of_line = lf
+indent_style = space
 indent_size = 2
+
+##########################
+# Специфические настройки C#
+##########################
+
+[*.cs]
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# Стиль фигурных скобок
+csharp_new_line_before_open_brace = all
+
+# Пробелы
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+
+# Использование var
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:suggestion
+
+##########################
+# Markdown / Docs
+##########################
+
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = 100
