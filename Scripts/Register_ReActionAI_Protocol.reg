@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\reactionai]
+@="URL:ReActionAI Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\reactionai\shell\open\command]
+@="powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\User\\source\\repos\\ReActionAI\\Scripts\\run_reactionai.ps1\" \"%1\""
