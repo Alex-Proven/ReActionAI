@@ -1,0 +1,7 @@
+# Папка проекта для упаковки
+ARCHIVE: C:\Users\User\source\repos\ReActionAI
+# Папка назначения (Google Drive)
+UPLOAD_TO: C:\Users\User\MyDrive\ReActionAI\archives
+# Включить чистку датированных архивов (оставит только KEEP_N самых свежих)
+# PURGE_OLD: TRUE
+# KEEP_N: 0
