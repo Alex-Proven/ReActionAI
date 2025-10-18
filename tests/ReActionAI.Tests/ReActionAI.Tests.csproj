@@ -1,15 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <!-- Целевые платформы: .NET 6 и .NET 8 -->
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <RootNamespace>ReActionAI.Tests</RootNamespace>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="xunit" Version="2.9.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\ReActionAI\ReActionAI.csproj" />
   </ItemGroup>
+
 </Project>
