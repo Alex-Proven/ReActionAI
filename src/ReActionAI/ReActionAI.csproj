@@ -3,6 +3,7 @@
   <PropertyGroup>
     <!-- Целевые платформы: .NET Framework 4.8 + .NET 8.0 -->
     <TargetFrameworks>net48;net8.0</TargetFrameworks>
+	<NoWarn>1591</NoWarn>
 
     <AssemblyName>ReActionAI</AssemblyName>
     <RootNamespace>ReActionAI</RootNamespace>
