@@ -4,6 +4,9 @@
         <TargetFramework>net48</TargetFramework>
         <IsPackable>false</IsPackable>
         <Nullable>enable</Nullable>
+        <Platforms>AnyCPU;x64</Platforms>
+		<LangVersion>latestMajor</LangVersion>
+		<Nullable>enable</Nullable>
     </PropertyGroup>
 
     <!-- NuGet-пакеты для тестов (совместимы с net48) -->

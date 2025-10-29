@@ -22,6 +22,7 @@
 
     <!-- Символы условной компиляции -->
     <DefineConstants>TRACE;DEBUG;NET8_0_OR_GREATER</DefineConstants>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <!-- Для старого .NET Framework 4.8 -->
