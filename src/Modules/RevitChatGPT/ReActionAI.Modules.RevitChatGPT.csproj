@@ -1,0 +1,82 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Revit 2024 = .NET Framework 4.8 -->
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+
+    <AssemblyName>ReActionAI.Modules.RevitChatGPT</AssemblyName>
+    <RootNamespace>ReActionAI.Modules.RevitChatGPT</RootNamespace>
+
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <!-- Ссылка на проект абстракций (ВНИМАНИЕ: верный относительный путь) -->
+
+  <!-- Прямые ссылки на Revit API -->
+  <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>$(ProgramFiles)\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>$(ProgramFiles)\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <!-- NuGet-пакеты (как у тебя в решении) -->
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.10" />
+  </ItemGroup>
+
+  <!-- Служебные файлы, которые копируем рядом с DLL -->
+  <ItemGroup>
+    <None Update="Config\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ReActionAI.Modules.RevitChatGPT.addin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Abstractions\ReActionAI.Abstractions\ReActionAI.Abstractions.csproj" />
+    <ProjectReference Include="..\..\ReActionAI\ReActionAI.csproj" />
+  </ItemGroup>
+
+  <!-- Автокопирование DLL и генерация .addin (Debug) -->
+  <Target Name="CopyAddin" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <PropertyGroup>
+      <!-- ВАЖНО: используем переменную MSBuild $(AppData), а не PowerShell-вызов -->
+      <AddinDir>$(AppData)\Autodesk\Revit\Addins\2024</AddinDir>
+      <AddinFile>$(AddinDir)\ReActionAI.Modules.RevitChatGPT.addin</AddinFile>
+      <DllDest>$(AddinDir)\ReActionAI.Modules.RevitChatGPT.dll</DllDest>
+    </PropertyGroup>
+
+    <!-- Создать каталог, если его нет -->
+    <MakeDir Directories="$(AddinDir)" />
+
+    <!-- Копируем собранную DLL -->
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(DllDest)" SkipUnchangedFiles="true" />
+
+    <!-- Сгенерировать .addin с абсолютным путём к DLL -->
+    <ItemGroup>
+      <AddinXml Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;" />
+      <AddinXml Include="&lt;RevitAddIns&gt;" />
+      <AddinXml Include="  &lt;AddIn Type=&quot;Application&quot;&gt;" />
+      <AddinXml Include="    &lt;Name&gt;ReActionAI.Modules.RevitChatGPT&lt;/Name&gt;" />
+      <AddinXml Include="    &lt;Assembly&gt;$(DllDest)&lt;/Assembly&gt;" />
+      <AddinXml Include="    &lt;AddInId&gt;8D83C86B-B739-4ACD-9DBB-1C878153DB4A&lt;/AddInId&gt;" />
+      <AddinXml Include="    &lt;FullClassName&gt;ReActionAI.Modules.RevitChatGPT.App&lt;/FullClassName&gt;" />
+      <AddinXml Include="    &lt;VendorId&gt;REAI&lt;/VendorId&gt;" />
+      <AddinXml Include="    &lt;VendorDescription&gt;ReActionAI&lt;/VendorDescription&gt;" />
+      <AddinXml Include="  &lt;/AddIn&gt;" />
+      <AddinXml Include="&lt;/RevitAddIns&gt;" />
+    </ItemGroup>
+
+    <WriteLinesToFile File="$(AddinFile)" Lines="@(AddinXml)" Overwrite="true" Encoding="UTF-8" />
+  </Target>
+</Project>

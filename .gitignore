@@ -1,20 +1,7 @@
-
-# Build results
-bin/
-obj/
-[Bb]uild/
-# VS
+# Build artifacts
+**/bin/
+**/obj/
 .vs/
-*.user
-*.suo
-*.userprefs
-# Packages
-packages/
-*.nupkg
-# Logs
-*.log
-# Rider/JetBrains
-.idea/
-# OS
-.DS_Store
-Thumbs.db
+
+# Secrets
+**/Config/appsettings.json

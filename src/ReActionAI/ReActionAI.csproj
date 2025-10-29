@@ -29,5 +29,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.10" />
+  </ItemGroup>
 
 </Project>
