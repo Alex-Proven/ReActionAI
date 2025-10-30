@@ -1,38 +1,76 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using Autodesk.Revit.UI;
 
 namespace ReActionAI.Modules.RevitChatGPT
 {
-    /// Добавляет панель «AI Tools» и кнопку «Pack Project»
+    /// <summary>
+    /// Revit Application Add-in:
+    /// - создаёт вкладку ReActionAI и панель AI Tools;
+    /// - регистрирует док-панель ChatGPT (справа);
+    /// - добавляет кнопки Pack Project и ChatGPT.
+    /// </summary>
     public class App : IExternalApplication
     {
+        private const string TabName   = "ReActionAI";
+        private const string PanelName = "AI Tools";
+
         public Result OnStartup(UIControlledApplication application)
         {
-            const string tabName = "ReActionAI";
-            const string panelName = "AI Tools";
+            // 1) Вкладка
+            try { application.CreateRibbonTab(TabName); } catch { /* уже существует */ }
 
-            try { application.CreateRibbonTab(tabName); } catch { /* таб уже есть */ }
+            // 2) Панель
+            RibbonPanel panel = application.GetRibbonPanels(TabName)
+                .FirstOrDefault(p => string.Equals(p.Name, PanelName, StringComparison.OrdinalIgnoreCase))
+                ?? application.CreateRibbonPanel(TabName, PanelName);
 
-            RibbonPanel? panel = null;
-            foreach (var p in application.GetRibbonPanels(tabName))
-                if (p.Name.Equals(panelName, StringComparison.OrdinalIgnoreCase)) { panel = p; break; }
-            panel ??= application.CreateRibbonPanel(tabName, panelName);
+            // 3) Регистрация док-панели ChatGPT (DockedRight)
+            try
+            {
+                var provider = new UI.ChatPaneProvider(); // класс провайдера содержимого
+                application.RegisterDockablePane(UI.ChatDock.PaneId, UI.ChatDock.PaneTitle, provider);
+            }
+            catch
+            {
+                // Если уже зарегистрирована — игнорируем
+            }
 
-            string asm = Assembly.GetExecutingAssembly().Location;
-            var btnData = new PushButtonData(
-                "PackProjectButton",
-                "Pack Project",
-                asm,
-                "ReActionAI.Modules.RevitChatGPT.Commands.PackProjectCommand"
-            );
-            var btn = panel.AddItem(btnData) as PushButton;
-            if (btn != null)
-                btn.ToolTip = "Собрать ZIP/PNG/Base64 через Make-ChatMini-Image.ps1";
+            // 4) Кнопки
+            string asmPath = Assembly.GetExecutingAssembly().Location;
+
+            // 4.1 Pack Project (у вас уже была — проверим, чтобы не дублировать)
+            var packBtn = new PushButtonData(
+                name: "PackProjectButton",
+                text: "Pack Project",
+                assemblyName: asmPath,
+                className: "ReActionAI.Modules.RevitChatGPT.Commands.PackProjectCommand")
+            {
+                ToolTip = "Собрать ZIP/PNG/Base64 через Make-ChatMini-Image.ps1"
+            };
+            if (!panel.GetItems().OfType<PushButton>().Any(b => b.Name == "PackProjectButton"))
+                panel.AddItem(packBtn);
+
+            // 4.2 ChatGPT
+            var chatBtn = new PushButtonData(
+                name: "OpenChatWindowButton",
+                text: "ChatGPT",
+                assemblyName: asmPath,
+                className: "ReActionAI.Modules.RevitChatGPT.Commands.OpenChatWindowCommand")
+            {
+                ToolTip = "Открыть панель ChatGPT (закреплена справа)"
+            };
+            if (!panel.GetItems().OfType<PushButton>().Any(b => b.Name == "OpenChatWindowButton"))
+                panel.AddItem(chatBtn);
 
             return Result.Succeeded;
         }
 
-        public Result OnShutdown(UIControlledApplication application) => Result.Succeeded;
+        public Result OnShutdown(UIControlledApplication application)
+        {
+            // Здесь ничего очищать не требуется
+            return Result.Succeeded;
+        }
     }
 }
