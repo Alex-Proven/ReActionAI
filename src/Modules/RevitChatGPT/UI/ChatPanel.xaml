@@ -1,0 +1,147 @@
+<UserControl x:Class="ReActionAI.Modules.RevitChatGPT.UI.ChatPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             MinWidth="320" MinHeight="200"
+             Background="#F3F3F3">
+
+    <UserControl.Resources>
+        <!-- Цвета -->
+        <SolidColorBrush x:Key="TxtBg"      Color="#F1F3F5"/>
+        <SolidColorBrush x:Key="TxtBorder"  Color="#C8CCD2"/>
+        <SolidColorBrush x:Key="TxtFg"      Color="#2B2B2B"/>
+
+        <SolidColorBrush x:Key="BtnStroke"  Color="#C8CCD2"/>
+        <SolidColorBrush x:Key="BtnFill"    Color="#00FFFFFF"/>
+        <SolidColorBrush x:Key="BtnFillHover"   Color="#0F000000"/>
+        <SolidColorBrush x:Key="BtnFillPressed" Color="#1A000000"/>
+        <SolidColorBrush x:Key="BtnFg"      Color="#404040"/>
+
+        <!-- TextBox с placeholder -->
+        <Style x:Key="WatermarkTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource TxtBg}"/>
+            <Setter Property="Foreground" Value="{StaticResource TxtFg}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                            <TextBlock Margin="8,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="#8A8F97"
+                                       IsHitTestVisible="False"
+                                       Text="{TemplateBinding Tag}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Кнопка 32×32 с ободком -->
+        <Style x:Key="OutlinedSendButton" TargetType="Button">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource BtnFg}"/>
+            <Setter Property="Background" Value="{StaticResource BtnFill}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BtnStroke}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Content" Value=""/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="Pill"
+                                    CornerRadius="16"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource BtnFillHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource BtnFillPressed}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="ChatGPT"
+                   FontSize="15"
+                   FontWeight="SemiBold"
+                   Foreground="#333333"
+                   Margin="0,0,0,8"/>
+
+        <Border Grid.Row="1"
+                Background="White"
+                BorderBrush="#C8C8C8"
+                BorderThickness="1"
+                CornerRadius="3">
+            <ScrollViewer x:Name="HistoryScroll"
+                          VerticalScrollBarVisibility="Auto"
+                          Padding="8">
+                <StackPanel x:Name="History"/>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Нижняя панель -->
+        <Grid Grid.Row="2" Margin="0,6,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Текстовое поле -->
+            <Border Grid.Column="0"
+                    CornerRadius="16"
+                    Background="{StaticResource TxtBg}"
+                    BorderBrush="{StaticResource TxtBorder}"
+                    BorderThickness="1"
+                    Margin="0,0,6,0">
+                <TextBox x:Name="PromptBox"
+                         Style="{StaticResource WatermarkTextBox}"
+                         Tag="Ask ChatGPT"
+                         MinHeight="28"
+                         VerticalContentAlignment="Center"
+                         Background="{x:Null}"/>
+            </Border>
+
+            <!-- Кнопка 32×32 -->
+            <Button Grid.Column="1"
+                    Style="{StaticResource OutlinedSendButton}"
+                    ToolTip="Отправить"
+                    Click="OnSend"
+                    VerticalAlignment="Center"/>
+        </Grid>
+    </Grid>
+</UserControl>
