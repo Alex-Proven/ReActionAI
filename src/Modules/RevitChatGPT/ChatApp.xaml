@@ -1,8 +1,0 @@
-<Application x:Class="ReActionAI.Modules.RevitChatGPT.ChatApp"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="UI/ChatWindow.xaml">
-    <Application.Resources>
-        <!-- общие ресурсы при необходимости -->
-    </Application.Resources>
-</Application>

@@ -1,81 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <!-- Revit 2024 = .NET Framework 4.8 -->
-    <TargetFramework>net48</TargetFramework>
-    <UseWPF>true</UseWPF>
 
-    <AssemblyName>ReActionAI.Modules.RevitChatGPT</AssemblyName>
-    <RootNamespace>ReActionAI.Modules.RevitChatGPT</RootNamespace>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
-    <Platforms>AnyCPU;x64</Platforms>
-  </PropertyGroup>
-
-  <!-- Прямые ссылки на Revit API (локальные DLL Revit 2024) -->
-  <ItemGroup>
-    <Reference Include="RevitAPI">
-      <HintPath>$(ProgramFiles)\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI">
-      <HintPath>$(ProgramFiles)\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-
-  <!-- Файлы конфигурации, копируем рядом с DLL -->
-  <ItemGroup>
-    <None Include="Config\appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <!-- Внутрипроектные зависимости -->
-  <ItemGroup>
-    <ProjectReference Include="..\..\Abstractions\ReActionAI.Abstractions\ReActionAI.Abstractions.csproj" />
-    <ProjectReference Include="..\..\ReActionAI\ReActionAI.csproj" />
-  </ItemGroup>
-
-  <!-- После сборки Debug: скопировать DLL в %AppData%\...\Addins\2024 и сгенерировать .addin -->
-  <Target Name="CopyAddin" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+    <!-- Только Revit: .NET Framework 4.8 x64 -->
     <PropertyGroup>
-      <AddinDir>$(AppData)\Autodesk\Revit\Addins\2024</AddinDir>
-      <AddinFile>$(AddinDir)\ReActionAI.Modules.RevitChatGPT.addin</AddinFile>
-      <DllDest>$(AddinDir)\ReActionAI.Modules.RevitChatGPT.dll</DllDest>
+        <TargetFramework>net48</TargetFramework>
+        <Platforms>x64</Platforms>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <PlatformTarget>x64</PlatformTarget>
+        <Prefer32Bit>false</Prefer32Bit>
+        <OutputPath>bin\x64\$(Configuration)\</OutputPath>
     </PropertyGroup>
 
-    <MakeDir Directories="$(AddinDir)" Condition="!Exists('$(AddinDir)')" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(DllDest)" SkipUnchangedFiles="true" />
-
-    <!-- Генерируем .addin с двумя секциями: Command + Application -->
+    <!-- Наши проекты -->
     <ItemGroup>
-      <AddinXml Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;" />
-      <AddinXml Include="&lt;RevitAddIns&gt;" />
-
-      <!-- Команда -->
-      <AddinXml Include="  &lt;AddIn Type=&quot;Command&quot;&gt;" />
-      <AddinXml Include="    &lt;Name&gt;ReActionAI.PackProject&lt;/Name&gt;" />
-      <AddinXml Include="    &lt;Assembly&gt;$(DllDest)&lt;/Assembly&gt;" />
-      <AddinXml Include="    &lt;AddInId&gt;8D83C86B-B739-4ACD-9DBB-1C878153DBA4&lt;/AddInId&gt;" />
-      <AddinXml Include="    &lt;FullClassName&gt;ReActionAI.Modules.RevitChatGPT.Commands.PackProjectCommand&lt;/FullClassName&gt;" />
-      <AddinXml Include="    &lt;VendorId&gt;RAAI&lt;/VendorId&gt;" />
-      <AddinXml Include="    &lt;VendorDescription&gt;ReActionAI&lt;/VendorDescription&gt;" />
-      <AddinXml Include="  &lt;/AddIn&gt;" />
-
-      <!-- Приложение (создаёт вкладку/панель и кнопку) -->
-      <AddinXml Include="  &lt;AddIn Type=&quot;Application&quot;&gt;" />
-      <AddinXml Include="    &lt;Name&gt;ReActionAI.App&lt;/Name&gt;" />
-      <AddinXml Include="    &lt;Assembly&gt;$(DllDest)&lt;/Assembly&gt;" />
-      <AddinXml Include="    &lt;AddInId&gt;6E12C980-A9AF-4C47-BC16-4D87A4CA31C1&lt;/AddInId&gt;" />
-      <AddinXml Include="    &lt;FullClassName&gt;ReActionAI.Modules.RevitChatGPT.App&lt;/FullClassName&gt;" />
-      <AddinXml Include="    &lt;VendorId&gt;RAAI&lt;/VendorId&gt;" />
-      <AddinXml Include="    &lt;VendorDescription&gt;ReActionAI&lt;/VendorDescription&gt;" />
-      <AddinXml Include="  &lt;/AddIn&gt;" />
-
-      <AddinXml Include="&lt;/RevitAddIns&gt;" />
+        <ProjectReference Include="..\..\Abstractions\ReActionAI.Abstractions\ReActionAI.Abstractions.csproj" />
+        <ProjectReference Include="..\..\ReActionAI\ReActionAI.csproj" />
     </ItemGroup>
 
-    <WriteLinesToFile File="$(AddinFile)" Lines="@(AddinXml)" Overwrite="true" Encoding="UTF-8" />
-  </Target>
+    <!-- Системные и Revit -->
+    <ItemGroup>
+        <Reference Include="System.Net.Http" />
+        <Reference Include="WindowsBase" />
+        <Reference Include="PresentationCore" />
+        <Reference Include="PresentationFramework" />
+
+        <Reference Include="RevitAPI">
+            <HintPath>$(ProgramFiles)\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
+        </Reference>
+        <Reference Include="RevitAPIUI">
+            <HintPath>$(ProgramFiles)\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
 </Project>

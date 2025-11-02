@@ -1,37 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <!-- Консольное приложение -->
-    <OutputType>Exe</OutputType>
-
-    <!-- Целевая платформа -->
-    <TargetFramework>net8.0</TargetFramework>
-
-    <!-- Имя и пространство имён -->
-    <AssemblyName>RePackAI</AssemblyName>
-    <RootNamespace>RePackAI</RootNamespace>
-
-    <!-- Включить строгую проверку nullable -->
-    <Nullable>enable</Nullable>
-
-    <!-- Генерация XML-документации -->
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
-    <!-- Версия языка F# -->
-    <LangVersion>preview</LangVersion>
-
-    <!-- Символы условной компиляции -->
-    <DefineConstants>TRACE;DEBUG;NET8_0_OR_GREATER</DefineConstants>
-    <Platforms>AnyCPU;x64</Platforms>
+    <!-- Целевая платформа Revit-плагина -->
+    <TargetFramework>net48</TargetFramework>
+    <Platforms>x64</Platforms>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
+  <!-- Ссылка на общий модуль -->
   <ItemGroup>
-    <Compile Include="Program.fs" />
+    <ProjectReference Include="..\..\src\Abstractions\ReActionAI.Abstractions\ReActionAI.Abstractions.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.10" />
-  </ItemGroup>
-
 </Project>
