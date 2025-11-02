@@ -1,3 +1,0 @@
-# Packer v6 request (edit paths if needed)
-ARCHIVE: C:\Users\User\source\repos\ReActionAI
-UPLOAD_TO: C:\Users\User\MyDrive\ReActionAI\archives

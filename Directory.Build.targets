@@ -1,0 +1,17 @@
+﻿<Project>
+  <PropertyGroup>
+    <RevitAddinsFolder>$(APPDATA)\Autodesk\Revit\Addins\2024\ReActionAI</RevitAddinsFolder>
+  </PropertyGroup>
+
+  <Target Name="DeployRevitAddin" AfterTargets="Build" Condition="'$(MSBuildProjectName)' == 'ReActionAI.Modules.RevitChatGPT'">
+    <ItemGroup>
+      <AddinFiles Include="$(MSBuildProjectDirectory)\ReActionAI.Modules.RevitChatGPT.addin" />
+      <DllFiles Include="$(TargetPath)" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(RevitAddinsFolder)" />
+
+    <Copy SourceFiles="@(AddinFiles)" DestinationFolder="$(RevitAddinsFolder)" OverWriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(DllFiles)" DestinationFolder="$(RevitAddinsFolder)" OverWriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
+  </Target>
+</Project>

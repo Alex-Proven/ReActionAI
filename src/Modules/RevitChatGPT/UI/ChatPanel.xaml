@@ -1,0 +1,23 @@
+<UserControl x:Class="ReActionAI.Modules.RevitChatGPT.UI.ChatPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             MinWidth="320" MinHeight="200" Background="#F3F3F3">
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <TextBlock Text="ReActionAI — ChatGPT" FontWeight="Bold" FontSize="16"/>
+    <ScrollViewer Grid.Row="1" Margin="0,8,0,8">
+      <TextBlock TextWrapping="Wrap"
+                 Text="MVP панель ReActionAI. Подключение к ChatGPT будет добавлено позже."/>
+    </ScrollViewer>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal">
+      <TextBox Width="240" Margin="0,0,8,0" />
+      <Button Width="80" Content="Send"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

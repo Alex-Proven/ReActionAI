@@ -1,33 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <!-- Целевые платформы: .NET Framework 4.8 + .NET 8.0 -->
-    <TargetFrameworks>net48;net8.0</TargetFrameworks>
-	<NoWarn>1591</NoWarn>
-
-    <AssemblyName>ReActionAI</AssemblyName>
-    <RootNamespace>ReActionAI</RootNamespace>
-
-    <!-- Включить поддержку Nullable -->
-    <Nullable>enable</Nullable>
-
-    <!-- Генерация XML-документации -->
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
-    <!-- Зафиксировать версию языка -->
-    <LangVersion>13.0</LangVersion>
-	
-	<!-- Не считать предупреждения ошибками -->
-	<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-
-    <!-- Символы условной компиляции -->
-    <DefineConstants>TRACE;DEBUG;NET8_0_OR_GREATER</DefineConstants>
+    <TargetFramework>net48</TargetFramework>
+    <Platforms>x64</Platforms>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
-  <!-- Для старого .NET Framework 4.8 -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+  <ItemGroup>
+    <ProjectReference Include="..\Abstractions\ReActionAI.Abstractions\ReActionAI.Abstractions.csproj" />
   </ItemGroup>
-
 </Project>

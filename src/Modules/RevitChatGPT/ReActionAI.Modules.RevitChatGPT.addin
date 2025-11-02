@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <!-- Application add-in: регистрирует вкладку/панель и док-панель ChatGPT -->
+  <AddIn Type="Application">
+    <Name>ReActionAI.App</Name>
+    <Assembly>ReActionAI.Modules.RevitChatGPT.dll</Assembly>
+    <AddInId>6E12C980-A9AF-4A47-BC16-4DB71ACA31C1</AddInId>
+    <FullClassName>ReActionAI.Modules.RevitChatGPT.App</FullClassName>
+    <VendorId>RAAI</VendorId>
+    <VendorDescription>ReActionAI</VendorDescription>
+  </AddIn>
+
+  <!-- Command: открыть док-панель ChatGPT (если запускаешь как отдельную команду) -->
+  <AddIn Type="Command">
+    <Name>ReActionAI.ChatGPT</Name>
+    <Assembly>ReActionAI.Modules.RevitChatGPT.dll</Assembly>
+    <AddInId>DB83A77A-B739-4ACD-A9FD-7A7B1FC5BDA4</AddInId>
+    <FullClassName>ReActionAI.Modules.RevitChatGPT.Commands.Command</FullClassName>
+    <VendorId>RAAI</VendorId>
+    <VendorDescription>ReActionAI</VendorDescription>
+  </AddIn>
+
+  <!-- Command: заглушка “Pack Project” -->
+  <AddIn Type="Command">
+    <Name>ReActionAI.PackProject</Name>
+    <Assembly>ReActionAI.Modules.RevitChatGPT.dll</Assembly>
+    <AddInId>8D8C36E8-7B39-4ACD-9DBB-1C7B8153DBA4</AddInId>
+    <FullClassName>ReActionAI.Modules.RevitChatGPT.Commands.PackProjectCommand</FullClassName>
+    <VendorId>RAAI</VendorId>
+    <VendorDescription>ReActionAI</VendorDescription>
+  </AddIn>
+</RevitAddIns>
