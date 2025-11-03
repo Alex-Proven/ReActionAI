@@ -2,18 +2,20 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, auto-release-setup ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, auto-release-setup ]
 
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 20  # чтобы не висело часами, при необходимости увеличим
 
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_PACKAGES: ${{ github.workspace }}\.nuget\packages
+      ARTIFACTS_DIR: artifacts
 
     steps:
       - name: Checkout
@@ -26,37 +28,60 @@ jobs:
             8.0.x
             6.0.x
 
-      - name: Restore
-        run: dotnet restore ReActionAI.sln
-
-      # Сборка только тех проектов, которые не требуют RevitAPI
-      - name: Build Abstractions
-        run: dotnet build "src/Abstractions/ReActionAI.Abstractions.csproj" -c Release --no-restore
-
-      - name: Build RePackAI
+      - name: Show .NET info
         run: |
-          if (Test-Path "src/RePackAI/RePackAI.csproj") {
-            dotnet build "src/RePackAI/RePackAI.csproj" -c Release --no-restore
+          dotnet --info
+          dotnet --list-sdks
+          dotnet --list-runtimes
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('/.sln', '/.csproj', 'global.json') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore (solution)
+        run: dotnet restore ReActionAI.sln -v minimal
+
+      - name: Prepare artifacts dir
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force -Path "$env:ARTIFACTS_DIR" | Out-Null
+
+      # ==== Сборка только тех проектов, которые точно не требуют Autodesk SDK ====
+      - name: Build Abstractions (if exists)
+        shell: pwsh
+        run: |
+          if (Test-Path "src/Abstractions/ReActionAI.Abstractions.csproj") {
+            dotnet build "src/Abstractions/ReActionAI.Abstractions.csproj" `
+              -c Release --no-restore -v minimal -bl:"$env:ARTIFACTS_DIR/abstractions.binlog"
           }
 
-      - name: Build Core
+      - name: Build Core (if exists)
+        shell: pwsh
         run: |
           if (Test-Path "src/ReActionAI/ReActionAI.csproj") {
-            dotnet build "src/ReActionAI/ReActionAI.csproj" -c Release --no-restore
+            dotnet build "src/ReActionAI/ReActionAI.csproj" `
+              -c Release --no-restore -v minimal -bl:"$env:ARTIFACTS_DIR/core.binlog"
           }
 
-      - name: Test
+      - name: Test (if tests exist)
+        shell: pwsh
         run: |
           if (Test-Path "tests/ReActionAI.Tests/ReActionAI.Tests.csproj") {
-            dotnet test "tests/ReActionAI.Tests/ReActionAI.Tests.csproj" -c Release --no-build --verbosity normal
+            dotnet test "tests/ReActionAI.Tests/ReActionAI.Tests.csproj" `
+              -c Release --no-build --verbosity normal `
+              --logger "trx;LogFileName=$env:ARTIFACTS_DIR/test.trx"
           }
 
-      - name: Upload logs
+      # ==== Всегда выгружаем артефакты (binlog + тесты), даже при фейле ====
+      - name: Upload build artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs
+          name: ci-artifacts
           path: |
-            */.binlog
-            */TestResults/*
+            ${{ env.ARTIFACTS_DIR }}/*.binlog
+            ${{ env.ARTIFACTS_DIR }}/*.trx
           if-no-files-found: ignore
