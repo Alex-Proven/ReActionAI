@@ -1,31 +1,35 @@
-name: 🧩 Auto Release (from tag)
+name: Auto Release (from tag)
 
 on:
   push:
     tags:
-      - 'v*..'       # пример: v0.6.1
+      - 'v*'
 
 jobs:
   release:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Render release notes from template
+      - name: Generate release notes from template
         run: |
-          DATE="$(date +'%Y-%m-%d')"
-          BRANCH="${GITHUB_REF_NAME}"
-          AUTHOR="${GITHUB_ACTOR}"
+          VERSION=${GITHUB_REF#refs/tags/}
+          DATE=$(date +'%Y-%m-%d')
+          AUTHOR=$(git log -1 --pretty=format:'%an')
+          BRANCH=$(git branch --show-current || echo "master")
 
-          # читаем шаблон и делаем простые подстановки
-          sed -e "s/{{DATE}}/${DATE}/g" \
-              -e "s/{{BRANCH}}/${BRANCH}/g" \
+          sed -e "s/{{VERSION}}/${VERSION}/g" \
+              -e "s/{{TITLE}}/Auto release for ${VERSION}/g" \
+              -e "s/{{DATE}}/${DATE}/g" \
               -e "s/{{AUTHOR}}/${AUTHOR}/g" \
-              -e "s/{{VERSION}}/${GITHUB_REF_NAME}/g" \
+              -e "s/{{BRANCH}}/${BRANCH}/g" \
               RELEASE_TEMPLATE.md > RELEASE_NOTES.md
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release (attach ZIPs if found)
         uses: softprops/action-gh-release@v2
         with:
           name: ReActionAI ${{ github.ref_name }}
@@ -33,8 +37,13 @@ jobs:
           body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false
+          # Жёсткие пути, где ищем архивы внутри репозитория:
           files: |
-            FixPack_v6.zip
-            Scripts/Collector/collector_v2.zip
+            FixPack_v6/*.zip
+            Scripts/Collector/*.zip
+            Scripts//collector*_v*.zip
+            Releases//*.zip
+            out//*.zip
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
