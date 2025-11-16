@@ -1,23 +1,144 @@
 <UserControl x:Class="ReActionAI.Modules.RevitChatGPT.UI.ChatPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             MinWidth="320" MinHeight="200" Background="#F3F3F3">
-  <Grid Margin="10">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="*"/>
-      <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="600"
+             d:DesignWidth="400">
 
-    <TextBlock Text="ReActionAI — ChatGPT" FontWeight="Bold" FontSize="16"/>
-    <ScrollViewer Grid.Row="1" Margin="0,8,0,8">
-      <TextBlock TextWrapping="Wrap"
-                 Text="MVP панель ReActionAI. Подключение к ChatGPT будет добавлено позже."/>
-    </ScrollViewer>
+    <UserControl.Resources>
 
-    <StackPanel Grid.Row="2" Orientation="Horizontal">
-      <TextBox Width="240" Margin="0,0,8,0" />
-      <Button Width="80" Content="Send"/>
-    </StackPanel>
-  </Grid>
+        <!-- Общий стиль для круглых кнопок -->
+        <Style x:Key="RoundButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="999">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid Background="#FFF8F8F8">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <Border Grid.Row="0"
+                Background="#FFF2F2F2"
+                Padding="12">
+            <TextBlock Text="ReActionAI ChatGPT"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Foreground="#333333"/>
+        </Border>
+
+        <!-- Область сообщений -->
+        <Border Grid.Row="1"
+                Margin="8"
+                Padding="0"
+                BorderThickness="1"
+                BorderBrush="#DDDDDD">
+            <ScrollViewer x:Name="MessagesScrollViewer"
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="MessagesPanel">
+                    <TextBlock Text="Панель готова. Напишите сообщение."
+                               Foreground="#888888"
+                               Margin="4"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Нижняя панель как в ChatGPT -->
+        <Border Grid.Row="2"
+                Background="#00FFFFFF"
+                Padding="8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <!-- Круглая кнопка "+" -->
+                    <ColumnDefinition Width="Auto"/>
+                    <!-- Капсула ввода + send -->
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Кнопка "+" (круглая 36px, слева, ВНЕ капсулы) -->
+                <Button x:Name="PlusButton"
+                        Grid.Column="0"
+                        Width="32"
+                        Height="32"
+                        Margin="0,0,8,0"
+                        Style="{StaticResource RoundButtonStyle}"
+                        Background="#FFF2F2F2"
+                        BorderBrush="#FFE0E0E0"
+                        BorderThickness="1">
+                    <TextBlock Text="+"
+                               FontSize="18"
+                               Foreground="#555555"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"/>
+                </Button>
+
+                <!-- Капсула ввода + круглая отправка ВНУТРИ -->
+                <Grid Grid.Column="1">
+                    <!-- Капсула -->
+                    <Border x:Name="InputBorder"
+                            Background="#FFF4F4F4"
+                            CornerRadius="18"
+                            BorderBrush="#FFE0E0E0"
+                            BorderThickness="1"
+                            Height="32">
+                        <Grid>
+                            <!-- Поле ввода текста -->
+                            <TextBox x:Name="InputBox"
+                                     Margin="12,4,44,4"
+                                     VerticalContentAlignment="Center"
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     Foreground="#222222"
+                                     FontSize="13"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Кнопка отправки (круглая, справа ВНУТРИ капсулы) -->
+                    <Button x:Name="SendButton"
+                            Width="24"
+                            Height="24"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Margin="4,0,4,0"
+                            Style="{StaticResource RoundButtonStyle}"
+                            Background="Black"
+                            BorderBrush="Black"
+                            BorderThickness="1">
+                        <TextBlock Text="↑"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"/>
+                    </Button>
+                </Grid>
+            </Grid>
+        </Border>
+
+    </Grid>
 </UserControl>

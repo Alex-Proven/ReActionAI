@@ -1,25 +1,33 @@
+using System;
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using ReActionAI.Modules.RevitChatGPT.UI;
 
 namespace ReActionAI.Modules.RevitChatGPT.Commands
 {
-    [Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
+    [Transaction(TransactionMode.Manual)]
     public class Command : IExternalCommand
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(
+            ExternalCommandData commandData,
+            ref string message,
+            ElementSet elements)
         {
             var uiApp = commandData.Application;
 
+            App.EnsureThemeSubscription(uiApp);
+
             try
             {
-                var pane = uiApp.GetDockablePane(ChatDock.PaneId); // <-- PaneId
-                pane.Show();
+                // Открываем нашу док-панель по ID из App
+                DockablePane pane = uiApp.GetDockablePane(App.ChatPaneId);
+                pane.Show();   // В Revit 2024 другого метода нет
+
                 return Result.Succeeded;
             }
-            catch
+            catch (Exception ex)
             {
-                message = "Панель ChatGPT не зарегистрирована. Проверь OnStartup и GUID ChatDock.PaneId.";
+                message = "Не удалось открыть док-панель ChatGPT: " + ex.Message;
                 return Result.Failed;
             }
         }
