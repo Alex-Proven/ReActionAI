@@ -47,11 +47,12 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         private void InputBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpdatePlaceholderVisibility();
-            UpdateInputHeight();
+            UpdateInputHeight();      // пересчитываем высоту при изменении текста
         }
 
         private void InputBox_KeyDown(object sender, KeyEventArgs e)
         {
+            // Enter без Shift — отправка сообщения
             if (e.Key == Key.Enter && (Keyboard.Modifiers & ModifierKeys.Shift) == 0)
             {
                 e.Handled = true;
@@ -61,6 +62,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
+            // Заглушка
             MessageBox.Show("Кнопка + нажата");
         }
 
@@ -73,17 +75,18 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         private void SendMessage()
         {
-            string text = InputBox.Text.Trim();
+            var text = InputBox.Text.Trim();
             if (string.IsNullOrEmpty(text))
                 return;
 
             AddUserMessage(text);
 
-            string triple = text + " " + text + " " + text;
+            // ЭХО × 3 (в 3 раза длиннее)
+            var triple = text + " " + text + " " + text;
             AddBotMessage(triple);
 
             InputBox.Text = string.Empty;
-            UpdateInputHeight();
+            UpdateInputHeight();   // после очистки возвращаем высоту к минимуму
         }
 
         private void AddUserMessage(string text)
@@ -93,14 +96,13 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 Background = new SolidColorBrush(Color.FromRgb(220, 240, 255)),
                 CornerRadius = new CornerRadius(8),
                 Padding = new Thickness(10),
-                Margin = new Thickness(0, 0, 0, 10)
-            };
-
-            bubble.Child = new TextBlock
-            {
-                Text = text,
-                Foreground = Brushes.Black,
-                TextWrapping = TextWrapping.Wrap
+                Margin = new Thickness(0, 0, 0, 10),
+                Child = new TextBlock
+                {
+                    Text = text,
+                    Foreground = Brushes.Black,
+                    TextWrapping = TextWrapping.Wrap
+                }
             };
 
             MessagesPanel.Children.Add(bubble);
@@ -114,14 +116,13 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
                 CornerRadius = new CornerRadius(8),
                 Padding = new Thickness(10),
-                Margin = new Thickness(0, 0, 0, 10)
-            };
-
-            bubble.Child = new TextBlock
-            {
-                Text = text,
-                Foreground = Brushes.Black,
-                TextWrapping = TextWrapping.Wrap
+                Margin = new Thickness(0, 0, 0, 10),
+                Child = new TextBlock
+                {
+                    Text = text,
+                    Foreground = Brushes.Black,
+                    TextWrapping = TextWrapping.Wrap
+                }
             };
 
             MessagesPanel.Children.Add(bubble);
@@ -142,28 +143,36 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             if (InputPlaceholder == null || InputBox == null)
                 return;
 
-            bool hasText = !string.IsNullOrWhiteSpace(InputBox.Text);
-            bool hasFocus = InputBox.IsKeyboardFocused;
+            var hasText = !string.IsNullOrWhiteSpace(InputBox.Text);
+            var hasFocus = InputBox.IsKeyboardFocused;
 
             InputPlaceholder.Visibility = (hasText || hasFocus)
                 ? Visibility.Collapsed
                 : Visibility.Visible;
         }
 
-        // ------------------- ДИНАМИЧЕСКАЯ ВЫСОТА -------------------
+        // ------------------- ДИНАМИЧЕСКАЯ ВЫСОТА ВВОДА -------------------
 
+        /// <summary>
+        /// Подстраивает высоту овального контейнера под количество строк текста.
+        /// Минимум — InputMinHeight, дальше растёт с ростом LineCount.
+        /// </summary>
         private void UpdateInputHeight()
         {
             if (InputBorder == null || InputBox == null)
                 return;
 
-            int lines = Math.Max(1, InputBox.LineCount);
+            // Количество строк в TextBox (работает, когда контрол загружен)
+            var lines = Math.Max(1, InputBox.LineCount);
 
-            double lineHeight = InputBox.FontSize + 6.0;
+            // Примерная высота строки: размер шрифта + небольшой запас
+            var lineHeight = InputBox.FontSize + 6.0;
 
-            double desiredHeight = Math.Max(InputMinHeight, lines * lineHeight);
+            // Рассчитываем желаемую высоту
+            var desiredHeight = Math.Max(InputMinHeight, lines * lineHeight);
 
-            double maxHeight = 120.0;
+            // Ограничим разумной высотой, чтобы не занимало всю панель
+            var maxHeight = 120.0;
             if (desiredHeight > maxHeight)
                 desiredHeight = maxHeight;
 
@@ -172,17 +181,28 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         // ------------------- ТЕМА REVIT + стиль рамок -------------------
 
+        /// <summary>
+        /// Применение темы Revit к панели (isDark = true для тёмной темы).
+        /// Здесь задаём размеры кнопок и минимальную высоту контейнера.
+        /// </summary>
         private void ApplyRevitTheme(bool isDark)
         {
-            // Размеры кнопок
+            // Высота кнопки "+" остаётся фиксированной
             PlusButton.Height = InputMinHeight;
-            SendButton.Height = SendButtonHeight;
+
+            // Контейнер: минимальная высота, остальное — динамически в UpdateInputHeight()
             InputBorder.MinHeight = InputMinHeight;
+            InputBorder.Height = Double.NaN; // Auto, дальше подстроим в UpdateInputHeight
+
+            // Кнопка отправки — меньше по высоте
+            SendButton.Height = SendButtonHeight;
+
+            // Центрирование по вертикали
             InputBorder.VerticalAlignment = VerticalAlignment.Center;
             SendButton.VerticalAlignment = VerticalAlignment.Center;
 
-            // Тонкая аккуратная кромка (САМЫЙ ВАЖНЫЙ БЛОК)
-            SolidColorBrush borderBrush = isDark
+            // --- СТИЛЬ ТОНКОЙ КРОМКИ ---
+            var borderBrush = isDark
                 ? new SolidColorBrush(Color.FromRgb(85, 85, 85))    // #555
                 : new SolidColorBrush(Color.FromRgb(208, 208, 208)); // #D0
 
@@ -190,7 +210,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             PlusButton.BorderBrush = borderBrush;
             SendButton.BorderBrush = borderBrush;
 
-            // ФОНЫ
+            // ФОНЫ и текст
             if (isDark)
             {
                 InputBorder.Background = new SolidColorBrush(Color.FromRgb(50, 50, 50));
@@ -211,6 +231,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                     tbLight.Foreground = Brushes.Black;
             }
 
+            // Пересчитать высоту после смены темы
             UpdateInputHeight();
         }
     }
