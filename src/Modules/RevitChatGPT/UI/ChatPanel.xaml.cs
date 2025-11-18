@@ -12,6 +12,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         {
             InitializeComponent();
 
+            // По умолчанию считаем светлую тему
             ApplyRevitTheme(false);
 
             InputBox.GotFocus += InputBox_GotFocus;
@@ -44,6 +45,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         private void InputBox_KeyDown(object sender, KeyEventArgs e)
         {
+            // Enter без Shift — отправка сообщения
             if (e.Key == Key.Enter && (Keyboard.Modifiers & ModifierKeys.Shift) == 0)
             {
                 e.Handled = true;
@@ -53,6 +55,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
+            // Пока заглушка
             MessageBox.Show("Кнопка + нажата");
         }
 
@@ -71,7 +74,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
             AddUserMessage(text);
 
-            //  ЭХО × 3 (в 3 раза длиннее)
+            // ЭХО × 3 (в 3 раза длиннее)
             string triple = text + " " + text + " " + text;
             AddBotMessage(triple);
 
@@ -144,12 +147,17 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         // ------------------- ТЕМА REVIT -------------------
 
+        /// <summary>
+        /// Применение темы Revit к панели (isDark = true для тёмной темы).
+        /// </summary>
         private void ApplyRevitTheme(bool isDark)
         {
+            // Поле ввода: фон
             InputBorder.Background = isDark
-                ? new SolidColorBrush(Color.FromRgb(50, 50, 50))
-                : new SolidColorBrush(Color.FromRgb(244, 244, 244));
+                ? new SolidColorBrush(Color.FromRgb(50, 50, 50))   // тёмная тема
+                : Brushes.White;                                   // светлая — чисто белый
 
+            // Поле ввода: рамка
             InputBorder.BorderBrush = isDark
                 ? new SolidColorBrush(Color.FromRgb(80, 80, 80))
                 : new SolidColorBrush(Color.FromRgb(220, 220, 220));
@@ -157,19 +165,22 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             // Кнопка отправки
             if (isDark)
             {
+                // В тёмной теме — белая кнопка, чёрный текст
                 SendButton.Background = Brushes.White;
                 SendButton.BorderBrush = Brushes.White;
 
-                if (SendButton.Content is TextBlock tb)
-                    tb.Foreground = Brushes.Black;
+                if (SendButton.Content is TextBlock tbDark)
+                    tbDark.Foreground = Brushes.Black;
             }
             else
             {
-                SendButton.Background = Brushes.Black;
-                SendButton.BorderBrush = Brushes.Black;
+                // В светлой теме — как кнопка "+":
+                // фон #F2F2F2, граница #E0E0E0, текст чёрный
+                SendButton.Background = new SolidColorBrush(Color.FromRgb(242, 242, 242));
+                SendButton.BorderBrush = new SolidColorBrush(Color.FromRgb(224, 224, 224));
 
-                if (SendButton.Content is TextBlock tb)
-                    tb.Foreground = Brushes.White;
+                if (SendButton.Content is TextBlock tbLight)
+                    tbLight.Foreground = Brushes.Black;
             }
 
             // Кнопка "+"

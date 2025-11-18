@@ -7,10 +7,10 @@
              d:DesignHeight="600"
              d:DesignWidth="400">
 
-    <!-- Стили -->
+    <!-- Styles -->
     <UserControl.Resources>
 
-        <!-- Стиль круглых кнопок -->
+        <!-- Base round button style -->
         <Style x:Key="RoundButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
@@ -43,11 +43,8 @@
         </Grid.RowDefinitions>
 
 
-        <!-- ▬▬▬▬ ЗАГОЛОВОК ▬▬▬▬ -->
-        <Border Grid.Row="0"
-                Background="#FFF2F2F2"
-                Padding="12">
-
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#FFF2F2F2" Padding="12">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -68,12 +65,10 @@
                            Foreground="#333333"
                            VerticalAlignment="Center"/>
             </Grid>
-
         </Border>
 
 
-
-        <!-- ▬▬▬▬ ОБЛАСТЬ СООБЩЕНИЙ ▬▬▬▬ -->
+        <!-- Messages area -->
         <Border Grid.Row="1"
                 Margin="12,8,12,8"
                 Background="White"
@@ -90,12 +85,10 @@
                             Orientation="Vertical"
                             VerticalAlignment="Top"/>
             </ScrollViewer>
-
         </Border>
 
 
-
-        <!-- ▬▬▬▬ ПАНЕЛЬ ВВОДА ▬▬▬▬ -->
+        <!-- Input panel -->
         <Border Grid.Row="2"
                 Margin="12,0,12,12"
                 Background="#00FFFFFF"
@@ -108,41 +101,36 @@
                 </Grid.ColumnDefinitions>
 
 
-                <!-- КНОПКА + -->
+                <!-- Plus button -->
                 <Button x:Name="PlusButton"
                         Grid.Column="0"
                         Width="32"
                         Height="32"
                         Margin="0,0,8,0"
-                        Background="#FFF2F2F2"
+                        Background="White"
                         BorderBrush="#E0E0E0"
                         BorderThickness="1">
 
-                    <!-- Локальный стиль: круглая + тень при наведении -->
                     <Button.Style>
                         <Style TargetType="Button"
                                BasedOn="{StaticResource RoundButtonStyle}">
-                            <Setter Property="Background" Value="#FFF2F2F2"/>
+                            <Setter Property="Background" Value="White"/>
                             <Setter Property="BorderBrush" Value="#E0E0E0"/>
                             <Setter Property="BorderThickness" Value="1"/>
 
-                            <!-- Без тени по умолчанию -->
                             <Setter Property="Effect">
                                 <Setter.Value>
-                                    <DropShadowEffect Color="#000000"
-                                                      BlurRadius="0"
+                                    <DropShadowEffect BlurRadius="0"
                                                       ShadowDepth="0"
                                                       Opacity="0"/>
                                 </Setter.Value>
                             </Setter>
 
                             <Style.Triggers>
-                                <!-- При наведении включаем мягкую тень -->
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Effect">
                                         <Setter.Value>
-                                            <DropShadowEffect Color="#000000"
-                                                              BlurRadius="8"
+                                            <DropShadowEffect BlurRadius="8"
                                                               ShadowDepth="1"
                                                               Opacity="0.18"/>
                                         </Setter.Value>
@@ -155,17 +143,14 @@
                     <TextBlock Text="+"
                                FontSize="26"
                                Margin="0,-5,0,0"
-                               Foreground="#555555"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               TextAlignment="Center"/>
+                               Foreground="#555555"/>
                 </Button>
 
 
-                <!-- ПОЛЕ ВВОДА -->
+                <!-- Input area -->
                 <Grid Grid.Column="1">
 
-                    <!-- Контейнер ввода с мягким оттенением -->
+                    <!-- Input container -->
                     <Border x:Name="InputBorder"
                             Background="#FFF4F4F4"
                             BorderBrush="#E0E0E0"
@@ -175,24 +160,20 @@
 
                         <Border.Style>
                             <Style TargetType="Border">
-                                <!-- Базовая лёгкая тень -->
                                 <Setter Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect Color="#000000"
-                                                          BlurRadius="6"
+                                        <DropShadowEffect BlurRadius="6"
                                                           ShadowDepth="0"
                                                           Opacity="0.12"/>
                                     </Setter.Value>
                                 </Setter>
 
                                 <Style.Triggers>
-                                    <!-- При фокусе тень усиливается -->
                                     <DataTrigger Binding="{Binding IsKeyboardFocused, ElementName=InputBox}"
                                                  Value="True">
                                         <Setter Property="Effect">
                                             <Setter.Value>
-                                                <DropShadowEffect Color="#000000"
-                                                                  BlurRadius="16"
+                                                <DropShadowEffect BlurRadius="16"
                                                                   ShadowDepth="1"
                                                                   Opacity="0.20"/>
                                             </Setter.Value>
@@ -204,7 +185,7 @@
 
                         <Grid>
 
-                            <!-- ВВОДИМЫЙ ТЕКСТ -->
+                            <!-- Text input -->
                             <TextBox x:Name="InputBox"
                                      Margin="12,10,44,4"
                                      VerticalContentAlignment="Top"
@@ -218,7 +199,7 @@
                                      MinHeight="24"
                                      MaxHeight="96"/>
 
-                            <!-- PLACEHOLDER -->
+                            <!-- Placeholder -->
                             <TextBlock x:Name="InputPlaceholder"
                                        Text="Напишите сообщение"
                                        Margin="16,8,44,0"
@@ -232,7 +213,7 @@
                     </Border>
 
 
-                    <!-- КНОПКА ОТПРАВКИ -->
+                    <!-- Send button -->
                     <Button x:Name="SendButton"
                             Width="24"
                             Height="24"
@@ -243,27 +224,23 @@
                         <Button.Style>
                             <Style TargetType="Button"
                                    BasedOn="{StaticResource RoundButtonStyle}">
-                                <Setter Property="Background" Value="Black"/>
-                                <Setter Property="BorderBrush" Value="Black"/>
+                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="BorderBrush" Value="#E0E0E0"/>
                                 <Setter Property="BorderThickness" Value="1"/>
 
-                                <!-- Без тени по умолчанию -->
                                 <Setter Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect Color="#000000"
-                                                          BlurRadius="0"
+                                        <DropShadowEffect BlurRadius="0"
                                                           ShadowDepth="0"
                                                           Opacity="0"/>
                                     </Setter.Value>
                                 </Setter>
 
                                 <Style.Triggers>
-                                    <!-- Тень при наведении -->
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Effect">
                                             <Setter.Value>
-                                                <DropShadowEffect Color="#000000"
-                                                                  BlurRadius="8"
+                                                <DropShadowEffect BlurRadius="8"
                                                                   ShadowDepth="1"
                                                                   Opacity="0.22"/>
                                             </Setter.Value>
@@ -276,10 +253,7 @@
                         <TextBlock Text="↑"
                                    FontSize="14"
                                    FontWeight="Bold"
-                                   Foreground="White"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   TextAlignment="Center"/>
+                                   Foreground="Black"/>
                     </Button>
 
                 </Grid>
