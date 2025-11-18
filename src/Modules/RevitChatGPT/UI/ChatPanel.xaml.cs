@@ -8,6 +8,11 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 {
     public partial class ChatPanel : UserControl
     {
+        // Минимальная высота овального контейнера ввода
+        private const double InputMinHeight = 32.0;
+        // Высота кнопки отправки (меньше контейнера)
+        private const double SendButtonHeight = 24.0;
+
         public ChatPanel()
         {
             InitializeComponent();
@@ -24,6 +29,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             PlusButton.Click += PlusButton_Click;
 
             UpdatePlaceholderVisibility();
+            UpdateInputHeight();
         }
 
         // ------------------- ВВОД -------------------
@@ -41,11 +47,11 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         private void InputBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpdatePlaceholderVisibility();
+            UpdateInputHeight();
         }
 
         private void InputBox_KeyDown(object sender, KeyEventArgs e)
         {
-            // Enter без Shift — отправка сообщения
             if (e.Key == Key.Enter && (Keyboard.Modifiers & ModifierKeys.Shift) == 0)
             {
                 e.Handled = true;
@@ -55,7 +61,6 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
-            // Заглушка
             MessageBox.Show("Кнопка + нажата");
         }
 
@@ -74,11 +79,11 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
             AddUserMessage(text);
 
-            // ЭХО × 3 (в 3 раза длиннее)
             string triple = text + " " + text + " " + text;
             AddBotMessage(triple);
 
             InputBox.Text = string.Empty;
+            UpdateInputHeight();
         }
 
         private void AddUserMessage(string text)
@@ -145,64 +150,68 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 : Visibility.Visible;
         }
 
-        // ------------------- ТЕМА REVIT -------------------
+        // ------------------- ДИНАМИЧЕСКАЯ ВЫСОТА -------------------
 
-        /// <summary>
-        /// Применение темы Revit к панели (isDark = true для тёмной темы).
-        /// Здесь же задаём высоту элементов.
-        /// </summary>
+        private void UpdateInputHeight()
+        {
+            if (InputBorder == null || InputBox == null)
+                return;
+
+            int lines = Math.Max(1, InputBox.LineCount);
+
+            double lineHeight = InputBox.FontSize + 6.0;
+
+            double desiredHeight = Math.Max(InputMinHeight, lines * lineHeight);
+
+            double maxHeight = 120.0;
+            if (desiredHeight > maxHeight)
+                desiredHeight = maxHeight;
+
+            InputBorder.Height = desiredHeight;
+        }
+
+        // ------------------- ТЕМА REVIT + стиль рамок -------------------
+
         private void ApplyRevitTheme(bool isDark)
         {
-            // Высоты элементов
-            const double inputHeight = 32; // высота кнопки "+" и контейнера
-            const double sendHeight = 24; // кнопка отправки — меньше!
-
-            PlusButton.Height = inputHeight;
-            InputBorder.Height = inputHeight;
-
-            // Уменьшенная кнопка отправки — больше не будет сплюснутой
-            SendButton.Height = sendHeight;
-
-            // Центрирование
+            // Размеры кнопок
+            PlusButton.Height = InputMinHeight;
+            SendButton.Height = SendButtonHeight;
+            InputBorder.MinHeight = InputMinHeight;
             InputBorder.VerticalAlignment = VerticalAlignment.Center;
             SendButton.VerticalAlignment = VerticalAlignment.Center;
 
-            // --- СТИЛИ ТЕМЫ ---
-            InputBorder.Background = isDark
-                ? new SolidColorBrush(Color.FromRgb(50, 50, 50))
-                : Brushes.White;
+            // Тонкая аккуратная кромка (САМЫЙ ВАЖНЫЙ БЛОК)
+            SolidColorBrush borderBrush = isDark
+                ? new SolidColorBrush(Color.FromRgb(85, 85, 85))    // #555
+                : new SolidColorBrush(Color.FromRgb(208, 208, 208)); // #D0
 
-            InputBorder.BorderBrush = isDark
-                ? new SolidColorBrush(Color.FromRgb(80, 80, 80))
-                : new SolidColorBrush(Color.FromRgb(220, 220, 220));
+            InputBorder.BorderBrush = borderBrush;
+            PlusButton.BorderBrush = borderBrush;
+            SendButton.BorderBrush = borderBrush;
 
+            // ФОНЫ
             if (isDark)
             {
+                InputBorder.Background = new SolidColorBrush(Color.FromRgb(50, 50, 50));
+                PlusButton.Background = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+
                 SendButton.Background = Brushes.White;
-                SendButton.BorderBrush = Brushes.White;
 
                 if (SendButton.Content is TextBlock tbDark)
                     tbDark.Foreground = Brushes.Black;
             }
             else
             {
+                InputBorder.Background = Brushes.White;
+                PlusButton.Background = new SolidColorBrush(Color.FromRgb(242, 242, 242));
                 SendButton.Background = new SolidColorBrush(Color.FromRgb(242, 242, 242));
-                SendButton.BorderBrush = new SolidColorBrush(Color.FromRgb(224, 224, 224));
 
                 if (SendButton.Content is TextBlock tbLight)
                     tbLight.Foreground = Brushes.Black;
             }
 
-            PlusButton.Background = isDark
-                ? new SolidColorBrush(Color.FromRgb(45, 45, 45))
-                : new SolidColorBrush(Color.FromRgb(242, 242, 242));
-
-            PlusButton.BorderBrush = isDark
-                ? new SolidColorBrush(Color.FromRgb(80, 80, 80))
-                : new SolidColorBrush(Color.FromRgb(224, 224, 224));
-
-            if (PlusButton.Content is TextBlock p)
-                p.Foreground = isDark ? Brushes.White : Brushes.Black;
+            UpdateInputHeight();
         }
     }
 }
