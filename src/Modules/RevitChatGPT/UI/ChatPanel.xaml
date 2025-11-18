@@ -40,6 +40,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+
         <!-- ▬▬▬▬ ЗАГОЛОВОК ▬▬▬▬ -->
         <Border Grid.Row="0"
                 Background="#FFF2F2F2"
@@ -51,49 +52,67 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Иконка 44x44 -->
+                <!-- Иконка увеличена -->
                 <Image Grid.Column="0"
                        Source="/ReActionAI.Modules.RevitChatGPT;component/Resources/icon32.png"
                        Width="44"
                        Height="44"
-                       Margin="0,0,10,0"
-                       SnapsToDevicePixels="True"/>
+                       Margin="0,0,8,0"
+                       Stretch="Uniform"/>
 
-                <!-- Шрифт 11 pt (как "Напишите сообщение") -->
+                <!-- Текст заголовка -->
                 <TextBlock Grid.Column="1"
                            Text="ReActionAI — когнитивный ассистент для повышения эффективности BIM-проектирования и оптимизации проектных процессов"
-                           FontSize="11"
-                           FontWeight="Normal"
-                           Foreground="#333333"
                            TextWrapping="Wrap"
+                           FontSize="12"
+                           Foreground="#333333"
                            VerticalAlignment="Center"/>
+
             </Grid>
 
         </Border>
 
-        <!-- ▬▬▬▬ СООБЩЕНИЯ ▬▬▬▬ -->
+
+
+        <!-- ▬▬▬▬ ОБЛАСТЬ СООБЩЕНИЙ ▬▬▬▬ -->
         <Border Grid.Row="1"
-                Margin="8"
-                BorderBrush="#DDDDDD"
+                Margin="12,8,12,8"
+                Background="White"
+                CornerRadius="12"
+                BorderBrush="#E0E0E0"
                 BorderThickness="1">
+
             <ScrollViewer x:Name="MessagesScrollViewer"
-                          VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="MessagesPanel"/>
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="0">
+
+                <StackPanel x:Name="MessagesPanel"
+                            Margin="12,8,12,8"
+                            Orientation="Vertical"
+                            VerticalAlignment="Top"/>
             </ScrollViewer>
+
         </Border>
 
-        <!-- ▬▬▬▬ НИЖНЯЯ ПАНЕЛЬ ▬▬▬▬ -->
+
+
+        <!-- ▬▬▬▬ ПАНЕЛЬ ВВОДА ▬▬▬▬ -->
         <Border Grid.Row="2"
+                Margin="12,0,12,12"
                 Background="#00FFFFFF"
                 Padding="8">
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- кнопка "+" -->
+
+                <!-- Кнопка + -->
                 <Button x:Name="PlusButton"
+                        Grid.Column="0"
                         Width="32"
                         Height="32"
                         Margin="0,0,8,0"
@@ -106,36 +125,46 @@
                                Foreground="#555555"/>
                 </Button>
 
+
+                <!-- Поле ввода -->
                 <Grid Grid.Column="1">
+
                     <Border x:Name="InputBorder"
                             Background="#FFF4F4F4"
                             BorderBrush="#E0E0E0"
                             BorderThickness="1"
                             CornerRadius="18"
-                            Height="32">
+                            MinHeight="32">
 
                         <Grid>
+
                             <TextBox x:Name="InputBox"
                                      Margin="12,4,44,4"
-                                     VerticalContentAlignment="Center"
+                                     VerticalContentAlignment="Top"
                                      Background="Transparent"
                                      BorderThickness="0"
                                      FontSize="13"
                                      Foreground="#222222"
                                      AcceptsReturn="True"
-                                     TextWrapping="Wrap"/>
+                                     TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto"
+                                     MinHeight="24"
+                                     MaxHeight="96"/>
 
                             <TextBlock x:Name="InputPlaceholder"
                                        Text="Напишите сообщение"
                                        Margin="16,4,44,4"
-                                       VerticalAlignment="Center"
+                                       VerticalAlignment="Top"
                                        Foreground="#888888"
                                        FontSize="13"
                                        IsHitTestVisible="False"/>
+
                         </Grid>
+
                     </Border>
 
-                    <!-- отправка -->
+
+                    <!-- Кнопка отправки -->
                     <Button x:Name="SendButton"
                             Width="24"
                             Height="24"
@@ -150,9 +179,14 @@
                                    FontWeight="Bold"
                                    Foreground="White"/>
                     </Button>
+
                 </Grid>
+
             </Grid>
+
         </Border>
 
+
     </Grid>
+
 </UserControl>
