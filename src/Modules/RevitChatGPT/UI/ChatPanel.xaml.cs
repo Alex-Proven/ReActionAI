@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace ReActionAI.Modules.RevitChatGPT.UI
 {
@@ -47,7 +48,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         private void InputBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpdatePlaceholderVisibility();
-            UpdateInputHeight();      // пересчитываем высоту при изменении текста
+            UpdateInputHeight();      // пересчитываем (и анимируем) высоту при изменении текста
         }
 
         private void InputBox_KeyDown(object sender, KeyEventArgs e)
@@ -86,7 +87,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             AddBotMessage(triple);
 
             InputBox.Text = string.Empty;
-            UpdateInputHeight();   // после очистки возвращаем высоту к минимуму
+            UpdateInputHeight();   // после очистки плавно вернём высоту к минимуму
         }
 
         private void AddUserMessage(string text)
@@ -151,32 +152,53 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 : Visibility.Visible;
         }
 
-        // ------------------- ДИНАМИЧЕСКАЯ ВЫСОТА ВВОДА -------------------
+        // ------------------- ДИНАМИЧЕСКАЯ ВЫСОТА ВВОДА (с анимацией) -------------------
 
         /// <summary>
-        /// Подстраивает высоту овального контейнера под количество строк текста.
-        /// Минимум — InputMinHeight, дальше растёт с ростом LineCount.
+        /// Подстраивает высоту овального контейнера под количество строк текста
+        /// и плавно анимирует изменение высоты.
         /// </summary>
         private void UpdateInputHeight()
         {
             if (InputBorder == null || InputBox == null)
                 return;
 
-            // Количество строк в TextBox (работает, когда контрол загружен)
+            // Количество строк в TextBox
             var lines = Math.Max(1, InputBox.LineCount);
 
             // Примерная высота строки: размер шрифта + небольшой запас
             var lineHeight = InputBox.FontSize + 6.0;
 
-            // Рассчитываем желаемую высоту
+            // Желаемая высота
             var desiredHeight = Math.Max(InputMinHeight, lines * lineHeight);
 
-            // Ограничим разумной высотой, чтобы не занимало всю панель
+            // Ограничиваем, чтобы не занимать всю панель
             var maxHeight = 120.0;
             if (desiredHeight > maxHeight)
                 desiredHeight = maxHeight;
 
-            InputBorder.Height = desiredHeight;
+            // Текущая высота (если Auto/NaN — считаем минимальной)
+            var currentHeight = InputBorder.Height;
+            if (double.IsNaN(currentHeight) || currentHeight <= 0)
+                currentHeight = InputMinHeight;
+
+            // Если высота почти не меняется — анимацию не запускаем
+            if (Math.Abs(desiredHeight - currentHeight) < 0.5)
+            {
+                InputBorder.Height = desiredHeight;
+                return;
+            }
+
+            // Плавная анимация высоты
+            var animation = new DoubleAnimation
+            {
+                From = currentHeight,
+                To = desiredHeight,
+                Duration = TimeSpan.FromMilliseconds(150),
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
+            };
+
+            InputBorder.BeginAnimation(FrameworkElement.HeightProperty, animation, HandoffBehavior.SnapshotAndReplace);
         }
 
         // ------------------- ТЕМА REVIT + стиль рамок -------------------
@@ -190,9 +212,9 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             // Высота кнопки "+" остаётся фиксированной
             PlusButton.Height = InputMinHeight;
 
-            // Контейнер: минимальная высота, остальное — динамически в UpdateInputHeight()
+            // Контейнер: минимальная высота, сама высота управляется динамически
             InputBorder.MinHeight = InputMinHeight;
-            InputBorder.Height = Double.NaN; // Auto, дальше подстроим в UpdateInputHeight
+            InputBorder.Height = Double.NaN; // Auto, UpdateInputHeight всё подстроит
 
             // Кнопка отправки — меньше по высоте
             SendButton.Height = SendButtonHeight;
@@ -231,7 +253,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                     tbLight.Foreground = Brushes.Black;
             }
 
-            // Пересчитать высоту после смены темы
+            // Пересчитать (и анимировать) высоту после смены темы
             UpdateInputHeight();
         }
     }
