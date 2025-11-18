@@ -132,6 +132,7 @@
                 <!-- ПОЛЕ ВВОДА -->
                 <Grid Grid.Column="1">
 
+                    <!-- Контейнер ввода с мягким оттенением -->
                     <Border x:Name="InputBorder"
                             Background="#FFF4F4F4"
                             BorderBrush="#E0E0E0"
@@ -139,10 +140,40 @@
                             CornerRadius="18"
                             MinHeight="32">
 
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <!-- Базовая лёгкая тень -->
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#000000"
+                                                          BlurRadius="6"
+                                                          ShadowDepth="0"
+                                                          Opacity="0.12"/>
+                                    </Setter.Value>
+                                </Setter>
+
+                                <Style.Triggers>
+                                    <!-- При фокусе тень усиливается -->
+                                    <DataTrigger Binding="{Binding IsKeyboardFocused, ElementName=InputBox}"
+                                                 Value="True">
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect Color="#000000"
+                                                                  BlurRadius="16"
+                                                                  ShadowDepth="1"
+                                                                  Opacity="0.20"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
                         <Grid>
 
+                            <!-- ВВОДИМЫЙ ТЕКСТ ЧУТЬ НИЖЕ -->
                             <TextBox x:Name="InputBox"
-                                     Margin="12,4,44,4"
+                                     Margin="12,10,44,4"
                                      VerticalContentAlignment="Top"
                                      Background="Transparent"
                                      BorderThickness="0"
@@ -154,9 +185,10 @@
                                      MinHeight="24"
                                      MaxHeight="96"/>
 
+                            <!-- PLACEHOLDER ТОЖЕ НИЖЕ -->
                             <TextBlock x:Name="InputPlaceholder"
                                        Text="Напишите сообщение"
-                                       Margin="16,4,44,4"
+                                       Margin="16,8,44,0"
                                        VerticalAlignment="Top"
                                        Foreground="#888888"
                                        FontSize="13"
