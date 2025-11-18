@@ -18,6 +18,11 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             SendButton.Click += SendButton_Click;
             PlusButton.Click += PlusButton_Click;
             InputBox.KeyDown += InputBox_KeyDown;
+            InputBox.GotFocus += InputBox_GotFocus;
+            InputBox.LostFocus += InputBox_LostFocus;
+            InputBox.TextChanged += InputBox_TextChanged;
+
+            UpdatePlaceholderVisibility();
         }
 
         // ------------- События UI -------------
@@ -34,6 +39,21 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
             SendMessage();
+        }
+
+        private void InputBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholderVisibility();
+        }
+
+        private void InputBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholderVisibility();
+        }
+
+        private void InputBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdatePlaceholderVisibility();
         }
 
         private void PlusButton_Click(object sender, RoutedEventArgs e)
@@ -79,6 +99,21 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         private void ScrollToBottom()
         {
             MessagesScrollViewer?.ScrollToEnd();
+        }
+
+        // ------------- Подсказка в поле ввода -------------
+
+        private void UpdatePlaceholderVisibility()
+        {
+            if (InputPlaceholder == null || InputBox == null)
+                return;
+
+            bool hasText = !string.IsNullOrWhiteSpace(InputBox.Text);
+            bool hasFocus = InputBox.IsKeyboardFocused;
+
+            InputPlaceholder.Visibility = (hasText || hasFocus)
+                ? Visibility.Collapsed
+                : Visibility.Visible;
         }
 
         // ------------- Применение темы Revit -------------

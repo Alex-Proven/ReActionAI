@@ -9,7 +9,7 @@
 
     <UserControl.Resources>
 
-        <!-- Общий стиль для круглых кнопок -->
+        <!-- Стиль круглых кнопок -->
         <Style x:Key="RoundButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
@@ -40,85 +40,102 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок -->
+        <!-- ▬▬▬▬ ЗАГОЛОВОК ▬▬▬▬ -->
         <Border Grid.Row="0"
                 Background="#FFF2F2F2"
                 Padding="12">
-            <TextBlock Text="ReActionAI ChatGPT"
-                       FontSize="16"
-                       FontWeight="Bold"
-                       Foreground="#333333"/>
+
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Иконка 44x44 -->
+                <Image Grid.Column="0"
+                       Source="/ReActionAI.Modules.RevitChatGPT;component/Resources/icon32.png"
+                       Width="44"
+                       Height="44"
+                       Margin="0,0,10,0"
+                       SnapsToDevicePixels="True"/>
+
+                <!-- Шрифт 11 pt (как "Напишите сообщение") -->
+                <TextBlock Grid.Column="1"
+                           Text="ReActionAI — когнитивный ассистент для повышения эффективности BIM-проектирования и оптимизации проектных процессов"
+                           FontSize="11"
+                           FontWeight="Normal"
+                           Foreground="#333333"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"/>
+            </Grid>
+
         </Border>
 
-        <!-- Область сообщений -->
+        <!-- ▬▬▬▬ СООБЩЕНИЯ ▬▬▬▬ -->
         <Border Grid.Row="1"
                 Margin="8"
-                Padding="0"
-                BorderThickness="1"
-                BorderBrush="#DDDDDD">
+                BorderBrush="#DDDDDD"
+                BorderThickness="1">
             <ScrollViewer x:Name="MessagesScrollViewer"
                           VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="MessagesPanel">
-                    <TextBlock Text="Панель готова. Напишите сообщение."
-                               Foreground="#888888"
-                               Margin="4"/>
-                </StackPanel>
+                <StackPanel x:Name="MessagesPanel"/>
             </ScrollViewer>
         </Border>
 
-        <!-- Нижняя панель как в ChatGPT -->
+        <!-- ▬▬▬▬ НИЖНЯЯ ПАНЕЛЬ ▬▬▬▬ -->
         <Border Grid.Row="2"
                 Background="#00FFFFFF"
                 Padding="8">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <!-- Круглая кнопка "+" -->
                     <ColumnDefinition Width="Auto"/>
-                    <!-- Капсула ввода + send -->
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Кнопка "+" (круглая 36px, слева, ВНЕ капсулы) -->
+                <!-- кнопка "+" -->
                 <Button x:Name="PlusButton"
-                        Grid.Column="0"
                         Width="32"
                         Height="32"
                         Margin="0,0,8,0"
                         Style="{StaticResource RoundButtonStyle}"
                         Background="#FFF2F2F2"
-                        BorderBrush="#FFE0E0E0"
+                        BorderBrush="#E0E0E0"
                         BorderThickness="1">
                     <TextBlock Text="+"
                                FontSize="18"
-                               Foreground="#555555"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"/>
+                               Foreground="#555555"/>
                 </Button>
 
-                <!-- Капсула ввода + круглая отправка ВНУТРИ -->
                 <Grid Grid.Column="1">
-                    <!-- Капсула -->
                     <Border x:Name="InputBorder"
                             Background="#FFF4F4F4"
-                            CornerRadius="18"
-                            BorderBrush="#FFE0E0E0"
+                            BorderBrush="#E0E0E0"
                             BorderThickness="1"
+                            CornerRadius="18"
                             Height="32">
+
                         <Grid>
-                            <!-- Поле ввода текста -->
                             <TextBox x:Name="InputBox"
                                      Margin="12,4,44,4"
                                      VerticalContentAlignment="Center"
-                                     TextWrapping="Wrap"
-                                     AcceptsReturn="True"
-                                     BorderThickness="0"
                                      Background="Transparent"
+                                     BorderThickness="0"
+                                     FontSize="13"
                                      Foreground="#222222"
-                                     FontSize="13"/>
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"/>
+
+                            <TextBlock x:Name="InputPlaceholder"
+                                       Text="Напишите сообщение"
+                                       Margin="16,4,44,4"
+                                       VerticalAlignment="Center"
+                                       Foreground="#888888"
+                                       FontSize="13"
+                                       IsHitTestVisible="False"/>
                         </Grid>
                     </Border>
 
-                    <!-- Кнопка отправки (круглая, справа ВНУТРИ капсулы) -->
+                    <!-- отправка -->
                     <Button x:Name="SendButton"
                             Width="24"
                             Height="24"
@@ -127,14 +144,11 @@
                             Margin="4,0,4,0"
                             Style="{StaticResource RoundButtonStyle}"
                             Background="Black"
-                            BorderBrush="Black"
-                            BorderThickness="1">
+                            BorderBrush="Black">
                         <TextBlock Text="↑"
                                    FontSize="14"
                                    FontWeight="Bold"
-                                   Foreground="White"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Center"/>
+                                   Foreground="White"/>
                     </Button>
                 </Grid>
             </Grid>
