@@ -9,8 +9,8 @@ namespace ReActionAI.Modules.RevitChatGPT
     /// <summary>
     /// Revit Application Add-in:
     /// - создаёт вкладку ReActionAI и панель AI Tools;
-    /// - регистрирует док-панель ChatGPT (справа);
-    /// - добавляет кнопку ChatGPT.
+    /// - регистрирует док-панель Ассистент (справа);
+    /// - добавляет кнопку Ассистент.
     /// </summary>
     public class App : IExternalApplication
     {
@@ -38,10 +38,10 @@ namespace ReActionAI.Modules.RevitChatGPT
 
             string assemblyPath = Assembly.GetExecutingAssembly().Location;
 
-            // 3) Кнопка ChatGPT
+            // 3) Кнопка Ассистент
             PushButtonData chatBtnData = new PushButtonData(
-                "ReActionAI_ChatGPT_Button",
-                "ChatGPT",
+                "ReActionAI_Assistent_Button",
+                "Ассисиент",
                 assemblyPath,
                 "ReActionAI.Modules.RevitChatGPT.Commands.Command");
 
@@ -53,7 +53,7 @@ namespace ReActionAI.Modules.RevitChatGPT
             // 4) Регистрация док-панели
             _chatPanel = new UI.ChatPanel();
             var provider = new UI.ChatPanelProvider(_chatPanel);
-            application.RegisterDockablePane(ChatPaneId, "ChatGPT", provider);
+            application.RegisterDockablePane(ChatPaneId, "Ассистент", provider);
 
             // Пока нет UIApplication — считаем светлую тему
             RefreshChatTheme();
