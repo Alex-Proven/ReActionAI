@@ -12,34 +12,20 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         {
             InitializeComponent();
 
-            // По умолчанию считаем светлую тему
             ApplyRevitTheme(false);
 
-            SendButton.Click += SendButton_Click;
-            PlusButton.Click += PlusButton_Click;
-            InputBox.KeyDown += InputBox_KeyDown;
             InputBox.GotFocus += InputBox_GotFocus;
             InputBox.LostFocus += InputBox_LostFocus;
             InputBox.TextChanged += InputBox_TextChanged;
+            InputBox.KeyDown += InputBox_KeyDown;
+
+            SendButton.Click += SendButton_Click;
+            PlusButton.Click += PlusButton_Click;
 
             UpdatePlaceholderVisibility();
         }
 
-        // ------------- События UI -------------
-
-        private void InputBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter && !Keyboard.IsKeyDown(Key.LeftShift))
-            {
-                e.Handled = true;
-                SendMessage();
-            }
-        }
-
-        private void SendButton_Click(object sender, RoutedEventArgs e)
-        {
-            SendMessage();
-        }
+        // ------------------- ВВОД -------------------
 
         private void InputBox_GotFocus(object sender, RoutedEventArgs e)
         {
@@ -56,12 +42,26 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             UpdatePlaceholderVisibility();
         }
 
+        private void InputBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && (Keyboard.Modifiers & ModifierKeys.Shift) == 0)
+            {
+                e.Handled = true;
+                SendMessage();
+            }
+        }
+
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Кнопка + нажата");
         }
 
-        // ------------- Отправка -------------
+        private void SendButton_Click(object sender, RoutedEventArgs e)
+        {
+            SendMessage();
+        }
+
+        // ------------------- ОТПРАВКА -------------------
 
         private void SendMessage()
         {
@@ -70,38 +70,64 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 return;
 
             AddUserMessage(text);
+
+            //  ЭХО × 3 (в 3 раза длиннее)
+            string triple = text + " " + text + " " + text;
+            AddBotMessage(triple);
+
             InputBox.Text = string.Empty;
         }
 
         private void AddUserMessage(string text)
         {
-            var border = new Border
+            var bubble = new Border
             {
                 Background = new SolidColorBrush(Color.FromRgb(220, 240, 255)),
                 CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(8),
-                Margin = new Thickness(0, 0, 0, 8)
+                Padding = new Thickness(10),
+                Margin = new Thickness(0, 0, 0, 10)
             };
 
-            border.Child = new TextBlock
+            bubble.Child = new TextBlock
             {
                 Text = text,
                 Foreground = Brushes.Black,
                 TextWrapping = TextWrapping.Wrap
             };
 
-            MessagesPanel.Children.Add(border);
+            MessagesPanel.Children.Add(bubble);
             ScrollToBottom();
         }
 
-        // ------------- Автоскролл -------------
+        private void AddBotMessage(string text)
+        {
+            var bubble = new Border
+            {
+                Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(10),
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            bubble.Child = new TextBlock
+            {
+                Text = text,
+                Foreground = Brushes.Black,
+                TextWrapping = TextWrapping.Wrap
+            };
+
+            MessagesPanel.Children.Add(bubble);
+            ScrollToBottom();
+        }
+
+        // ------------------- АВТОСКРОЛЛ -------------------
 
         private void ScrollToBottom()
         {
             MessagesScrollViewer?.ScrollToEnd();
         }
 
-        // ------------- Подсказка в поле ввода -------------
+        // ------------------- ПЛЕЙСХОЛДЕР -------------------
 
         private void UpdatePlaceholderVisibility()
         {
@@ -116,55 +142,47 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 : Visibility.Visible;
         }
 
-        // ------------- Применение темы Revit -------------
+        // ------------------- ТЕМА REVIT -------------------
 
-        /// <summary>
-        /// Светлая тема  => isDark = false  => чёрная круглая кнопка.
-        /// Тёмная тема   => isDark = true   => белая круглая кнопка.
-        /// Вызывается из App через рефлексию.
-        /// </summary>
         private void ApplyRevitTheme(bool isDark)
         {
-            // Капсула ввода
             InputBorder.Background = isDark
                 ? new SolidColorBrush(Color.FromRgb(50, 50, 50))
                 : new SolidColorBrush(Color.FromRgb(244, 244, 244));
 
             InputBorder.BorderBrush = isDark
-                ? new SolidColorBrush(Color.FromRgb(90, 90, 90))
-                : new SolidColorBrush(Color.FromRgb(224, 224, 224));
+                ? new SolidColorBrush(Color.FromRgb(80, 80, 80))
+                : new SolidColorBrush(Color.FromRgb(220, 220, 220));
 
             // Кнопка отправки
             if (isDark)
             {
-                // Тёмная тема → белый круг, чёрная стрелка
                 SendButton.Background = Brushes.White;
                 SendButton.BorderBrush = Brushes.White;
 
-                if (SendButton.Content is TextBlock arrowDark)
-                    arrowDark.Foreground = Brushes.Black;
+                if (SendButton.Content is TextBlock tb)
+                    tb.Foreground = Brushes.Black;
             }
             else
             {
-                // Светлая тема → чёрный круг, белая стрелка
                 SendButton.Background = Brushes.Black;
                 SendButton.BorderBrush = Brushes.Black;
 
-                if (SendButton.Content is TextBlock arrowLight)
-                    arrowLight.Foreground = Brushes.White;
+                if (SendButton.Content is TextBlock tb)
+                    tb.Foreground = Brushes.White;
             }
 
             // Кнопка "+"
             PlusButton.Background = isDark
-                ? new SolidColorBrush(Color.FromRgb(60, 60, 60))
+                ? new SolidColorBrush(Color.FromRgb(45, 45, 45))
                 : new SolidColorBrush(Color.FromRgb(242, 242, 242));
 
             PlusButton.BorderBrush = isDark
-                ? new SolidColorBrush(Color.FromRgb(90, 90, 90))
+                ? new SolidColorBrush(Color.FromRgb(80, 80, 80))
                 : new SolidColorBrush(Color.FromRgb(224, 224, 224));
 
-            if (PlusButton.Content is TextBlock plus)
-                plus.Foreground = isDark ? Brushes.White : Brushes.Black;
+            if (PlusButton.Content is TextBlock p)
+                p.Foreground = isDark ? Brushes.White : Brushes.Black;
         }
     }
 }
