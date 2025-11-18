@@ -7,6 +7,7 @@
              d:DesignHeight="600"
              d:DesignWidth="400">
 
+    <!-- Стили -->
     <UserControl.Resources>
 
         <!-- Стиль круглых кнопок -->
@@ -32,6 +33,7 @@
 
     </UserControl.Resources>
 
+
     <Grid Background="#FFF8F8F8">
 
         <Grid.RowDefinitions>
@@ -52,22 +54,19 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Иконка увеличена -->
                 <Image Grid.Column="0"
                        Source="/ReActionAI.Modules.RevitChatGPT;component/Resources/icon32.png"
                        Width="44"
                        Height="44"
-                       Margin="0,0,8,0"
+                       Margin="0,0,10,0"
                        Stretch="Uniform"/>
 
-                <!-- Текст заголовка -->
                 <TextBlock Grid.Column="1"
                            Text="ReActionAI — когнитивный ассистент для повышения эффективности BIM-проектирования и оптимизации проектных процессов"
                            TextWrapping="Wrap"
                            FontSize="12"
                            Foreground="#333333"
                            VerticalAlignment="Center"/>
-
             </Grid>
 
         </Border>
@@ -84,8 +83,7 @@
 
             <ScrollViewer x:Name="MessagesScrollViewer"
                           VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled"
-                          Padding="0">
+                          HorizontalScrollBarVisibility="Disabled">
 
                 <StackPanel x:Name="MessagesPanel"
                             Margin="12,8,12,8"
@@ -110,23 +108,28 @@
                 </Grid.ColumnDefinitions>
 
 
-                <!-- Кнопка + -->
+                <!-- КНОПКА + -->
                 <Button x:Name="PlusButton"
                         Grid.Column="0"
                         Width="32"
                         Height="32"
                         Margin="0,0,8,0"
-                        Style="{StaticResource RoundButtonStyle}"
                         Background="#FFF2F2F2"
                         BorderBrush="#E0E0E0"
-                        BorderThickness="1">
+                        BorderThickness="1"
+                        Style="{StaticResource RoundButtonStyle}">
+
                     <TextBlock Text="+"
-                               FontSize="18"
-                               Foreground="#555555"/>
+                               FontSize="26"
+                               Margin="0,-5,0,0"
+                               Foreground="#555555"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               TextAlignment="Center"/>
                 </Button>
 
 
-                <!-- Поле ввода -->
+                <!-- ПОЛЕ ВВОДА -->
                 <Grid Grid.Column="1">
 
                     <Border x:Name="InputBorder"
@@ -164,7 +167,7 @@
                     </Border>
 
 
-                    <!-- Кнопка отправки -->
+                    <!-- КНОПКА ОТПРАВКИ -->
                     <Button x:Name="SendButton"
                             Width="24"
                             Height="24"
@@ -174,6 +177,7 @@
                             Style="{StaticResource RoundButtonStyle}"
                             Background="Black"
                             BorderBrush="Black">
+
                         <TextBlock Text="↑"
                                    FontSize="14"
                                    FontWeight="Bold"
@@ -185,7 +189,6 @@
             </Grid>
 
         </Border>
-
 
     </Grid>
 
