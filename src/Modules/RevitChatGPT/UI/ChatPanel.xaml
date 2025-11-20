@@ -32,7 +32,8 @@
             </Setter>
         </Style>
 
-        <!-- Text styles for header, chat messages and notifications -->
+        <!-- Резерв: стили для заголовка / сообщений / уведомлений,
+             если потом будем использовать по ключу -->
         <Style x:Key="ChatHeaderTextStyle" TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
@@ -56,7 +57,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-
         <!-- Header -->
         <Border Grid.Row="0" Background="#FFF2F2F2" Padding="12">
             <Grid VerticalAlignment="Center">
@@ -72,16 +72,17 @@
                        Margin="0,0,10,0"
                        Stretch="Uniform"/>
 
+                <!-- Заголовок: выравнивание по ширине + автоматические переносы -->
                 <TextBlock Grid.Column="1"
-                        Text="ReActionAI — ког&#x00AD;нитивный ас&#x00AD;систент для под&#x00AD;держки при&#x00AD;ня&#x00AD;тия про&#x00AD;ектных реше&#x00AD;ний, по&#x00AD;вышения эф&#x00AD;фек&#x00AD;ти&#x00AD;вности BIM-про&#x00AD;ек&#x00AD;ти&#x00AD;рования и оп&#x00AD;ти&#x00AD;ми&#x00AD;за&#x00AD;ции про&#x00AD;ектных про&#x00AD;цессов"
-                        TextWrapping="Wrap"
-                        TextAlignment="Justify"
-                        FontSize="12"
-                        Foreground="#333333"
-                        VerticalAlignment="Center"/>
+                           Text="ReActionAI — ког&#x00AD;нитивный ас&#x00AD;систент для под&#x00AD;держки при&#x00AD;ня&#x00AD;тия про&#x00AD;ектных реше&#x00AD;ний, по&#x00AD;вышения эф&#x00AD;фек&#x00AD;ти&#x00AD;вности BIM-про&#x00AD;ек&#x00AD;ти&#x00AD;рования и оп&#x00AD;ти&#x00AD;ми&#x00AD;за&#x00AD;ции про&#x00AD;ектных про&#x00AD;цессов"
+                           TextWrapping="Wrap"
+                           TextAlignment="Justify"
+                           IsHyphenationEnabled="True"
+                           FontSize="12"
+                           Foreground="#333333"
+                           VerticalAlignment="Center"/>
             </Grid>
         </Border>
-
 
         <!-- Messages area -->
         <Border Grid.Row="1"
@@ -95,15 +96,27 @@
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
 
+                <!-- Контейнер сообщений.
+                     Здесь задаём стиль ТОЛЬКО для TextBlock внутри сообщений: -->
                 <StackPanel x:Name="MessagesPanel"
                             Margin="12,8,12,8"
                             Orientation="Vertical"
-                            VerticalAlignment="Top"/>
+                            VerticalAlignment="Top">
+
+                    <StackPanel.Resources>
+                        <!-- Стиль по умолчанию только для текста сообщений чата -->
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="TextAlignment" Value="Justify"/>
+                            <Setter Property="IsHyphenationEnabled" Value="True"/>
+                        </Style>
+                    </StackPanel.Resources>
+
+                </StackPanel>
 
             </ScrollViewer>
 
         </Border>
-
 
         <!-- Input and controls area -->
         <Border Grid.Row="2"
@@ -116,7 +129,6 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
 
                 <!-- Left side: round plus button -->
                 <Button x:Name="PlusButton"
@@ -142,7 +154,6 @@
                                FontWeight="Bold"
                                Foreground="#333333"/>
                 </Button>
-
 
                 <!-- Right side: input + send button -->
                 <Grid Grid.Column="1">
@@ -210,8 +221,7 @@
 
                     </Border>
 
-
-                    <!-- Send button -->
+                    <!-- Send button (оставляю ровно там, где был) -->
                     <Button x:Name="SendButton"
                             Width="24"
                             Height="24"

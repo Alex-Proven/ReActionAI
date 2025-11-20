@@ -23,6 +23,10 @@
       <None Remove="Resources\icon32.png" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="NHyphenator" Version="2.0.0" />
+    </ItemGroup>
+
     <!-- Ссылки на проекты -->
     <ItemGroup>
         <ProjectReference Include="..\..\Abstractions\ReActionAI.Abstractions\ReActionAI.Abstractions.csproj" />
