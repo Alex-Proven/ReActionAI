@@ -32,17 +32,14 @@
             </Setter>
         </Style>
 
-        <!-- Chat header text style -->
         <Style x:Key="ChatHeaderTextStyle" TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
 
-        <!-- Chat message text style -->
         <Style x:Key="ChatMessageTextStyle" TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
 
-        <!-- Notification text style -->
         <Style x:Key="NotificationTextStyle" TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
@@ -74,9 +71,8 @@
                        Margin="0,0,10,0"
                        Stretch="Uniform"/>
 
-                <!-- Заголовок: выравнивание по ширине + автоматические переносы -->
                 <TextBlock Grid.Column="1"
-                           Text="ReActionAI — ког&#x00AD;нитивный ас&#x00AD;систент для под&#x00AD;держки при&#x00AD;ня&#x00AD;тия про&#x00AD;ектных решений, повы&#x00AD;ше&#x00AD;ния эф&#x00AD;фек&#x00AD;тивности BIM-про&#x00AD;ек&#x00AD;ти&#x00AD;рования и опти&#x00AD;ми&#x00AD;за&#x00AD;ции про&#x00AD;ектных про&#x00AD;цессов"
+                           Text="ReActionAI — ког&#x00AD;нитивный ас&#x00AD;систент для под&#x00AD;держки при&#x00AD;ня&#x00AD;тия про&#x00AD;ектных решений, повыш&#x00AD;ения эф&#x00AD;фек&#x00AD;тивности BIM-про&#x00AD;ек&#x00AD;ти&#x00AD;рования и опти&#x00AD;ми&#x00AD;за&#x00AD;ции про&#x00AD;ектных про&#x00AD;цессов"
                            TextWrapping="Wrap"
                            TextAlignment="Justify"
                            IsHyphenationEnabled="True"
@@ -84,8 +80,6 @@
                            Foreground="#333333"
                            VerticalAlignment="Center"/>
 
-                <!-- Пустая ячейка под будущую кнопку меню -->
-                <Grid Grid.Column="2"/>
             </Grid>
         </Border>
 
@@ -105,33 +99,33 @@
                             Margin="12,8,12,8"
                             Orientation="Vertical"
                             VerticalAlignment="Top">
+
                     <StackPanel.Resources>
-                        <!-- Стиль по умолчанию для текста сообщений чата -->
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"/>
                             <Setter Property="TextAlignment" Value="Justify"/>
                             <Setter Property="IsHyphenationEnabled" Value="True"/>
                         </Style>
                     </StackPanel.Resources>
+
                 </StackPanel>
 
             </ScrollViewer>
 
         </Border>
 
-        <!-- Input and controls area -->
+        <!-- Input and controls -->
         <Border Grid.Row="2"
                 Margin="12,0,12,12"
                 Background="Transparent">
 
             <Grid>
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Left side: round plus button -->
+                <!-- PLUS BUTTON -->
                 <Button x:Name="PlusButton"
                         Grid.Column="0"
                         Width="32"
@@ -141,20 +135,13 @@
                         BorderBrush="#E0E0E0"
                         BorderThickness="1"
                         Cursor="Hand">
+
                     <Button.Style>
                         <Style TargetType="Button"
                                BasedOn="{StaticResource RoundButtonStyle}">
                             <Setter Property="Background" Value="White"/>
                             <Setter Property="BorderBrush" Value="#E0E0E0"/>
                             <Setter Property="BorderThickness" Value="1"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#FFF4F4F4"/>
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter Property="Background" Value="#FFE0E0E0"/>
-                                </Trigger>
-                            </Style.Triggers>
                         </Style>
                     </Button.Style>
 
@@ -162,12 +149,12 @@
                                FontSize="16"
                                FontWeight="Bold"
                                Foreground="Black"/>
+
                 </Button>
 
-                <!-- Right side: input + send button -->
+                <!-- INPUT + SEND -->
                 <Grid Grid.Column="1">
 
-                    <!-- Input container -->
                     <Border x:Name="InputBorder"
                             Background="#FFF4F4F4"
                             BorderBrush="#E0E0E0"
@@ -175,34 +162,8 @@
                             CornerRadius="18"
                             MinHeight="32">
 
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect BlurRadius="6"
-                                                          ShadowDepth="0"
-                                                          Opacity="0.12"/>
-                                    </Setter.Value>
-                                </Setter>
-
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsKeyboardFocused, ElementName=InputBox}"
-                                                 Value="True">
-                                        <Setter Property="Effect">
-                                            <Setter.Value>
-                                                <DropShadowEffect BlurRadius="16"
-                                                                  ShadowDepth="1"
-                                                                  Opacity="0.20"/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-
                         <Grid>
 
-                            <!-- Text input -->
                             <TextBox x:Name="InputBox"
                                      Margin="12,10,44,4"
                                      VerticalContentAlignment="Top"
@@ -216,7 +177,6 @@
                                      MinHeight="24"
                                      MaxHeight="96"/>
 
-                            <!-- Placeholder -->
                             <TextBlock x:Name="InputPlaceholder"
                                        Text="Напишите сообщение"
                                        Margin="16,8,44,0"
@@ -227,40 +187,23 @@
                                        IsHitTestVisible="False"/>
 
                         </Grid>
-
                     </Border>
 
-                    <!-- Send button -->
+                    <!-- SEND BUTTON – NOW EXACTLY 24 × 24 -->
                     <Button x:Name="SendButton"
                             Width="24"
                             Height="24"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Margin="4,0,4,0"
+                            Margin="0,0,4,0"
                             Cursor="Hand">
+
                         <Button.Style>
                             <Style TargetType="Button"
                                    BasedOn="{StaticResource RoundButtonStyle}">
                                 <Setter Property="Background" Value="White"/>
                                 <Setter Property="BorderBrush" Value="#E0E0E0"/>
                                 <Setter Property="BorderThickness" Value="1"/>
-
-                                <Setter Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect BlurRadius="6"
-                                                          ShadowDepth="0"
-                                                          Opacity="0.12"/>
-                                    </Setter.Value>
-                                </Setter>
-
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#FFF4F4F4"/>
-                                    </Trigger>
-                                    <Trigger Property="IsPressed" Value="True">
-                                        <Setter Property="Background" Value="#FFE0E0E0"/>
-                                    </Trigger>
-                                </Style.Triggers>
                             </Style>
                         </Button.Style>
 
