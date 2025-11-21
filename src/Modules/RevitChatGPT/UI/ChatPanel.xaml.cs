@@ -15,6 +15,12 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         // Высота кнопки отправки (меньше контейнера)
         private const double SendButtonHeight = 24.0;
 
+        // Максимальная высота текстового ввода (после чего включается скролл)
+        private const double InputMaxHeight = 96.0;
+
+        // Скорость анимации изменения высоты (секунды) – если вернём анимацию
+        private const double HeightAnimationDuration = 0.10;
+
         public ChatPanel()
         {
             InitializeComponent();
@@ -43,6 +49,47 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             UpdateInputHeight();
         }
 
+        private void PlusButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(
+                "Кнопка \"+\" пока не реализована. Здесь в будущем будет выбор режимов или вложений.",
+                "ReActionAI",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private void SendButton_Click(object sender, RoutedEventArgs e)
+        {
+            SendMessageSafe();
+        }
+
+        private void SendMessageSafe()
+        {
+            try
+            {
+                var text = InputBox?.Text;
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    // TODO: здесь должен быть вызов сервиса отправки сообщения
+                    MessageBox.Show(
+                        $"Отправлено сообщение:\n\n{text}",
+                        "ReActionAI",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+
+                    InputBox!.Text = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Ошибка при отправке сообщения: {ex.Message}",
+                    "ReActionAI",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
         private void InputBox_GotFocus(object sender, RoutedEventArgs e)
         {
             UpdatePlaceholderVisibility();
@@ -69,216 +116,56 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             }
         }
 
-        private void PlusButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                MessageBox.Show("Кнопка + нажата");
-            }
-            catch
-            {
-                // Не даём исключению уйти в Revit
-            }
-        }
-
-        private void SendButton_Click(object sender, RoutedEventArgs e)
-        {
-            SendMessageSafe();
-        }
-
-        /// <summary>
-        /// Безопасная обёртка отправки сообщения.
-        /// Любое исключение гасится, чтобы не уронить Revit.
-        /// </summary>
-        private void SendMessageSafe()
-        {
-            try
-            {
-                SendMessageInternal();
-            }
-            catch
-            {
-                // TODO: логировать при необходимости, но Revit не должен падать
-            }
-        }
-
-        private void SendMessageInternal()
-        {
-            var text = InputBox != null ? InputBox.Text : string.Empty;
-            text = text == null ? string.Empty : text.Trim();
-
-            if (string.IsNullOrEmpty(text))
-                return;
-
-            AddUserMessageSafe(text);
-
-            // Временный эхо-ответ, чтобы видеть длинные сообщения
-            var triple = text + " " + text + " " + text;
-            AddBotMessageSafe(triple);
-
-            if (InputBox != null)
-            {
-                InputBox.Text = string.Empty;
-            }
-
-            UpdateInputHeight();
-        }
-
-        private void AddUserMessageSafe(string text)
-        {
-            try
-            {
-                AddUserMessage(text);
-            }
-            catch
-            {
-                // Гасим, чтобы не уронить Revit
-            }
-        }
-
-        private void AddBotMessageSafe(string text)
-        {
-            try
-            {
-                AddBotMessage(text);
-            }
-            catch
-            {
-                // Гасим, чтобы не уронить Revit
-            }
-        }
-
-        private void AddUserMessage(string text)
-        {
-            // Временная защита: обрезаем слишком длинный текст,
-            // чтобы не провоцировать падение Revit из-за WPF-разметки.
-            if (text != null && text.Length > 500)
-            {
-                text = text.Substring(0, 500) + "...";
-            }
-
-            // Перенос по слогам (сейчас RussianHyphenator — безопасная заглушка)
-            text = ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(text);
-
-            var bubble = new Border
-            {
-                Background = new SolidColorBrush(Color.FromRgb(220, 240, 255)),
-                CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(10),
-                Margin = new Thickness(0, 0, 0, 10),
-                Child = new TextBlock
-                {
-                    Text = text,
-                    Foreground = Brushes.Black,
-                    TextWrapping = TextWrapping.Wrap
-                }
-            };
-
-            if (MessagesPanel != null)
-            {
-                MessagesPanel.Children.Add(bubble);
-            }
-
-            ScrollToBottom();
-        }
-
-        private void AddBotMessage(string text)
-        {
-            if (text != null && text.Length > 500)
-            {
-                text = text.Substring(0, 500) + "...";
-            }
-
-            text = ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(text);
-
-            var bubble = new Border
-            {
-                Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
-                CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(10),
-                Margin = new Thickness(0, 0, 0, 10),
-                Child = new TextBlock
-                {
-                    Text = text,
-                    Foreground = Brushes.Black,
-                    TextWrapping = TextWrapping.Wrap
-                }
-            };
-
-            if (MessagesPanel != null)
-            {
-                MessagesPanel.Children.Add(bubble);
-            }
-
-            ScrollToBottom();
-        }
-
-        private void ScrollToBottom()
-        {
-            try
-            {
-                if (MessagesScrollViewer != null)
-                {
-                    MessagesScrollViewer.ScrollToEnd();
-                }
-            }
-            catch
-            {
-                // На всякий случай — не даём исключению уйти в Revit
-            }
-        }
-
         private void UpdatePlaceholderVisibility()
         {
             if (InputPlaceholder == null || InputBox == null)
                 return;
 
-            var hasText = !string.IsNullOrWhiteSpace(InputBox.Text);
-            var hasFocus = InputBox.IsKeyboardFocused;
-
             InputPlaceholder.Visibility =
-                (hasText || hasFocus) ? Visibility.Collapsed : Visibility.Visible;
+                string.IsNullOrWhiteSpace(InputBox.Text) && !InputBox.IsKeyboardFocused
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
         }
 
+        // ВАЖНО: финальная версия – без раздувания высоты, с корректным вычислением
         private void UpdateInputHeight()
         {
-            if (InputBorder == null || InputBox == null)
+            if (InputBox == null || InputBorder == null)
                 return;
 
-            var lines = Math.Max(1, InputBox.LineCount);
-            var lineHeight = InputBox.FontSize + 6.0;
-            var desiredHeight = Math.Max(InputMinHeight, lines * lineHeight);
-            var maxHeight = 120.0;
+            // Обновляем разметку, чтобы ActualWidth и DesiredSize были корректными
+            InputBox.UpdateLayout();
 
-            if (desiredHeight > maxHeight)
-                desiredHeight = maxHeight;
+            // Ширина для измерения: ширина контейнера минус запас под отступы и кнопку
+            var measureWidth = InputBorder.ActualWidth > 40
+                ? InputBorder.ActualWidth - 40
+                : InputBorder.ActualWidth;
 
-            var currentHeight = InputBorder.Height;
-            if (double.IsNaN(currentHeight) || currentHeight <= 0)
-                currentHeight = InputMinHeight;
-
-            if (Math.Abs(desiredHeight - currentHeight) < 0.5)
+            if (measureWidth <= 0)
             {
-                InputBorder.Height = desiredHeight;
+                // Если ширина ещё не рассчитана (панель только что создалась),
+                // просто выставляем минимальную высоту и выходим.
+                InputBorder.Height = InputMinHeight;
                 return;
             }
 
-            var animation = new DoubleAnimation
-            {
-                From = currentHeight,
-                To = desiredHeight,
-                Duration = TimeSpan.FromMilliseconds(150),
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
-            };
+            InputBox.Measure(new Size(measureWidth, double.PositiveInfinity));
+            var desiredHeight = InputBox.DesiredSize.Height;
 
-            InputBorder.BeginAnimation(
-                FrameworkElement.HeightProperty,
-                animation,
-                HandoffBehavior.SnapshotAndReplace);
+            // Ограничиваем высоту диапазоном [InputMinHeight; InputMaxHeight]
+            var targetHeight = Math.Max(InputMinHeight, Math.Min(InputMaxHeight, desiredHeight));
+
+            InputBorder.Height = targetHeight;
+        }
+
+        public void SetTheme(bool isDark)
+        {
+            ApplyRevitTheme(isDark);
         }
 
         private void ApplyRevitTheme(bool isDark)
         {
+            // Геометрия
             if (PlusButton != null)
             {
                 PlusButton.Height = InputMinHeight;
@@ -288,7 +175,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             if (InputBorder != null)
             {
                 InputBorder.MinHeight = InputMinHeight;
-                InputBorder.Height = double.NaN;
+                // Больше НЕ задаём Height = double.NaN – это и раздувало контейнер
                 InputBorder.VerticalAlignment = VerticalAlignment.Center;
             }
 
@@ -298,6 +185,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 SendButton.VerticalAlignment = VerticalAlignment.Center;
             }
 
+            // Общий цвет границ
             var borderBrush = isDark
                 ? new SolidColorBrush(Color.FromRgb(85, 85, 85))
                 : new SolidColorBrush(Color.FromRgb(208, 208, 208));
@@ -311,24 +199,35 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
             if (isDark)
             {
+                // Тёмная тема: фон кнопки отправки совпадает с фоном поля ввода
+                var inputBgDark = new SolidColorBrush(Color.FromRgb(50, 50, 50));
+
+
                 if (InputBorder != null)
-                    InputBorder.Background = new SolidColorBrush(Color.FromRgb(50, 50, 50));
+                    InputBorder.Background = inputBgDark;
+
                 if (PlusButton != null)
                     PlusButton.Background = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+
                 if (SendButton != null)
-                    SendButton.Background = Brushes.White;
+                    SendButton.Background = inputBgDark;
 
                 if (SendButton != null && SendButton.Content is TextBlock tbDark)
                     tbDark.Foreground = Brushes.Black;
             }
             else
             {
+                // Светлая тема: фон кнопки отправки совпадает с фоном поля ввода
+                Brush inputBgLight = Brushes.White;
+
                 if (InputBorder != null)
-                    InputBorder.Background = Brushes.White;
+                    InputBorder.Background = inputBgLight;
+
                 if (PlusButton != null)
                     PlusButton.Background = new SolidColorBrush(Color.FromRgb(242, 242, 242));
+
                 if (SendButton != null)
-                    SendButton.Background = new SolidColorBrush(Color.FromRgb(242, 242, 242));
+                    SendButton.Background = inputBgLight;
 
                 if (SendButton != null && SendButton.Content is TextBlock tbLight)
                     tbLight.Foreground = Brushes.Black;
