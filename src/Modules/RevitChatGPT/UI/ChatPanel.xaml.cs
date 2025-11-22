@@ -12,8 +12,26 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
     /// </summary>
     public partial class ChatPanel : UserControl
     {
+        /// <summary>
+        /// Минимальная высота контейнера ввода (одна строка).
+        /// </summary>
         private const double InputMinHeight = 32.0;
-        private const double InputMaxHeight = 120.0;
+
+        /// <summary>
+        /// Максимальная высота контейнера ввода (под ~20 строк).
+        /// </summary>
+        private const double InputMaxHeight = 400.0;
+
+        /// <summary>
+        /// Максимальное количество строк, которое учитываем при автоувеличении.
+        /// После этого высота не растёт, включается скролл.
+        /// </summary>
+        private const int InputMaxLines = 20;
+
+        /// <summary>
+        /// Дополнительный запас по высоте к размеру шрифта на строку.
+        /// </summary>
+        private const double LineExtraPadding = 6.0;
 
         public ChatPanel()
         {
@@ -27,6 +45,9 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 InputBox.LostFocus += InputBox_LostFocus;
                 InputBox.TextChanged += InputBox_TextChanged;
                 InputBox.KeyDown += InputBox_KeyDown;
+
+                // По умолчанию скролл скрыт — включаем только после 20 строк
+                InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
             }
 
             if (SendButton != null)
@@ -59,6 +80,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         private void InputBox_KeyDown(object sender, KeyEventArgs e)
         {
+            // Enter без Shift — отправка
             if (e.Key == Key.Enter && (Keyboard.Modifiers & ModifierKeys.Shift) == 0)
             {
                 e.Handled = true;
@@ -74,6 +96,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             }
             catch
             {
+                // Не даём исключению уйти в Revit
             }
         }
 
@@ -90,6 +113,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             }
             catch
             {
+                // Любые проблемы не должны рушить Revit
             }
         }
 
@@ -102,12 +126,15 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             if (string.IsNullOrEmpty(text))
                 return;
 
+            // Здесь уже гарантированно не null
             AddUserMessageSafe(text);
 
+            // Очистка поля ввода
             InputBox.Text = string.Empty;
             UpdatePlaceholderVisibility();
             UpdateInputHeight();
 
+            // Временный ответ бота-заглушка
             AddBotMessageSafe("Ответ ассистента (заглушка). Интеграция с ядром будет добавлена позже.");
         }
 
@@ -115,33 +142,51 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         #region Добавление сообщений
 
-        private void AddUserMessageSafe(string text)
+        /// <summary>
+        /// Безопасная обёртка, гасит исключения и отсекает null/пустую строку.
+        /// </summary>
+        private void AddUserMessageSafe(string? text)
         {
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
             try
             {
-                AddUserMessage(text);
+                // text! — здесь мы гарантируем компилятору, что null уже отсеян
+                AddUserMessage(text!);
             }
             catch
             {
+                // Гасим, чтобы не уронить Revit
             }
         }
 
-        private void AddBotMessageSafe(string text)
+        /// <summary>
+        /// Безопасная обёртка, гасит исключения и отсекает null/пустую строку.
+        /// </summary>
+        private void AddBotMessageSafe(string? text)
         {
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
             try
             {
-                AddBotMessage(text);
+                AddBotMessage(text!);
             }
             catch
             {
+                // Гасим, чтобы не уронить Revit
             }
         }
 
         private void AddUserMessage(string text)
         {
-            if (text != null && text.Length > 500)
+            // Временная защита: обрезаем слишком длинный текст,
+            // чтобы не провоцировать падение Revit из-за WPF-разметки.
+            if (text.Length > 500)
                 text = text.Substring(0, 500) + "...";
 
+            // Перенос по слогам (сейчас RussianHyphenator — безопасная заглушка)
             text = ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(text);
 
             var bubble = new Border
@@ -158,15 +203,14 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 }
             };
 
-            if (MessagesPanel != null)
-                MessagesPanel.Children.Add(bubble);
+            MessagesPanel?.Children.Add(bubble);
 
             ScrollToBottom();
         }
 
         private void AddBotMessage(string text)
         {
-            if (text != null && text.Length > 500)
+            if (text.Length > 500)
                 text = text.Substring(0, 500) + "...";
 
             text = ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(text);
@@ -185,8 +229,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 }
             };
 
-            if (MessagesPanel != null)
-                MessagesPanel.Children.Add(bubble);
+            MessagesPanel?.Children.Add(bubble);
 
             ScrollToBottom();
         }
@@ -195,8 +238,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         {
             try
             {
-                if (MessagesScrollViewer != null)
-                    MessagesScrollViewer.ScrollToEnd();
+                MessagesScrollViewer?.ScrollToEnd();
             }
             catch
             {
@@ -219,14 +261,38 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 (hasText || hasFocus) ? Visibility.Collapsed : Visibility.Visible;
         }
 
+        /// <summary>
+        /// Плавно подстраивает высоту овального контейнера ввода
+        /// под количество строк, с ограничением до 20 строк.
+        /// Скролл включается только после 20-й строки.
+        /// </summary>
         private void UpdateInputHeight()
         {
             if (InputBorder == null || InputBox == null)
                 return;
 
-            var lines = Math.Max(1, InputBox.LineCount);
-            var lineHeight = InputBox.FontSize + 6.0;
-            var desiredHeight = Math.Max(InputMinHeight, lines * lineHeight);
+            // Сколько строк реально в текстбоксе
+            var totalLines = Math.Max(1, InputBox.LineCount);
+
+            // Управляем скроллом:
+            // до 20 строк — скролл скрыт, после 20 — показываем
+            if (totalLines > InputMaxLines)
+                InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+            else
+                InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+
+            // Ограничиваем количество строк, по которым растёт высота
+            var lines = Math.Min(totalLines, InputMaxLines);
+
+            // Высота одной строки + небольшой запас
+            var lineHeight = InputBox.FontSize + LineExtraPadding;
+
+            // Высота под N строк + общий небольшой запас,
+            // чтобы верхняя строка не попадала под скругление/бордер
+            var desiredHeight = lines * lineHeight + 4.0;
+
+            if (desiredHeight < InputMinHeight)
+                desiredHeight = InputMinHeight;
 
             if (desiredHeight > InputMaxHeight)
                 desiredHeight = InputMaxHeight;
@@ -235,6 +301,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             if (double.IsNaN(currentHeight) || currentHeight <= 0)
                 currentHeight = InputMinHeight;
 
+            // Если различие маленькое — просто присваиваем
             if (Math.Abs(desiredHeight - currentHeight) < 0.5)
             {
                 InputBorder.Height = desiredHeight;
@@ -257,7 +324,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         #endregion
 
-        #region Тема
+        #region Тема (светлая/тёмная)
 
         private void ApplyRevitTheme(bool isDark)
         {
@@ -265,7 +332,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             {
                 InputBorder.MinHeight = InputMinHeight;
                 InputBorder.Height = double.NaN;
-                // ВАЖНО: прижимаем контейнер к НИЗУ ячейки футера
+                // Прижимаем контейнер к низу ячейки футера
                 InputBorder.VerticalAlignment = VerticalAlignment.Bottom;
             }
 

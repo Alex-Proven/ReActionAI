@@ -153,8 +153,7 @@
                                      AcceptsReturn="True"
                                      TextWrapping="Wrap"
                                      VerticalScrollBarVisibility="Auto"
-                                     MinHeight="24"
-                                     MaxHeight="96"/>
+                                     MinHeight="24"/>
 
                             <TextBlock x:Name="InputPlaceholder"
                                        Text="Напишите сообщение"
@@ -167,10 +166,8 @@
 
 
 
-                            <!--  Кнопка «Отправить» с отступами:
-                                 Right = 4
-                                 Top = 4
-                                 Bottom = 4 -->
+                            <!-- Кнопка «Отправить» с отступами:
+                                 Right = 4, Top = 4, Bottom = 4 -->
                             <Button x:Name="SendButton"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
