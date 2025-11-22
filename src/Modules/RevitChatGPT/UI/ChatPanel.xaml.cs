@@ -14,8 +14,9 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
     {
         /// <summary>
         /// Минимальная высота контейнера ввода (одна строка).
+        /// Чуть увеличена, чтобы не подрезались первые строки текста.
         /// </summary>
-        private const double InputMinHeight = 32.0;
+        private const double InputMinHeight = 36.0;
 
         /// <summary>
         /// Максимальная высота контейнера ввода (под ~20 строк).
@@ -24,7 +25,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         /// <summary>
         /// Максимальное количество строк, которое учитываем при автоувеличении.
-        /// После этого высота не растёт, включается скролл.
+        /// После этого высота не растёт, содержимое прокручивается.
         /// </summary>
         private const int InputMaxLines = 20;
 
@@ -46,7 +47,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 InputBox.TextChanged += InputBox_TextChanged;
                 InputBox.KeyDown += InputBox_KeyDown;
 
-                // По умолчанию скролл скрыт — включаем только после 20 строк
+                // Скроллбар изначально скрыт, крутим только колёсиком
                 InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
             }
 
@@ -92,6 +93,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         {
             try
             {
+                // Пока заглушка, позже сюда добавим логику меню/доп.команд
                 MessageBox.Show("Кнопка + нажата");
             }
             catch
@@ -126,7 +128,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             if (string.IsNullOrEmpty(text))
                 return;
 
-            // Здесь уже гарантированно не null
+            // Добавляем сообщение пользователя
             AddUserMessageSafe(text);
 
             // Очистка поля ввода
@@ -258,13 +260,13 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             var hasFocus = InputBox.IsKeyboardFocused;
 
             InputPlaceholder.Visibility =
-                (hasText || hasFocus) ? Visibility.Collapsed : Visibility.Hidden;
+                (hasText || hasFocus) ? Visibility.Collapsed : Visibility.Visible;
         }
 
         /// <summary>
         /// Плавно подстраивает высоту овального контейнера ввода
         /// под количество строк, с ограничением до 20 строк.
-        /// Скролл включается только после 20-й строки.
+        /// Скроллбар скрыт, но прокрутка колесом остаётся.
         /// </summary>
         private void UpdateInputHeight()
         {
@@ -274,12 +276,8 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             // Сколько строк реально в текстбоксе
             var totalLines = Math.Max(1, InputBox.LineCount);
 
-            // Управляем скроллом:
-            // до 20 строк — скролл скрыт, после 20 — показываем
-            if (totalLines > InputMaxLines)
-                InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
-            else
-                InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+            // Скроллбар всегда скрыт — крутим только колёсиком/тачпадом
+            InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
 
             // Ограничиваем количество строк, по которым растёт высота
             var lines = Math.Min(totalLines, InputMaxLines);
@@ -287,9 +285,9 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             // Высота одной строки + небольшой запас
             var lineHeight = InputBox.FontSize + LineExtraPadding;
 
-            // Высота под N строк + общий небольшой запас,
-            // чтобы верхняя строка не попадала под скругление/бордер
-            var desiredHeight = lines * lineHeight + 4.0;
+            // Высота под N строк + чуть увеличенный общий запас,
+            // чтобы верхние 1–3 строки не попадали под скругление/бордер
+            var desiredHeight = lines * lineHeight + 8.0;
 
             if (desiredHeight < InputMinHeight)
                 desiredHeight = InputMinHeight;
