@@ -15,17 +15,44 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         private const int InputMaxLines = 20;
         private const double LineExtraPadding = 6.0;
 
-        // Тестовые абзацы ответа бота
-        private const string EchoParagraph1 =
-            "Иногда достаточно одного маленького штриха, чтобы интерфейс наконец-то обрёл гармонию. " +
-            "Такой штрих делает его более живым и показывает заботу о каждом движении пользователя.";
-
-        private const string EchoParagraph2 =
-            "А порой именно незаметные детали формируют самое приятное впечатление от проекта. " +
-            "Эти маленькие штрихи создают ощущение завершённости и вдохновляют двигаться дальше ещё увереннее.";
-
         // Межабзацный интервал для всех сообщений (бот и пользователь)
         private const double ParagraphSpacing = 6.0;
+
+        // Текстовые блоки демо-ответа бота
+        private const string DemoIntroParagraph =
+            "Иногда интерфейсу не хватает всего одного аккуратного штриха, чтобы он стал понятнее и " +
+            "приятнее в использовании. Такие детали формируют ощущение стабильности и продуманности системы.";
+
+        private const string DemoQuoteHeader =
+            "Выписка из технического раздела стандарта:";
+
+        private const string DemoQuoteText =
+            "Участие в координации BIM-моделей: проверка моделей на наличие коллизий, " +
+            "контроль корректности параметров, настройка графики видов, разработка шаблонов " +
+            "и организация библиотек семейств проекта.";
+
+        private const string DemoMainParagraph =
+            "А порой именно незаметные мелочи определяют впечатление от всей системы. " +
+            "Чтобы пользователь чувствовал себя уверенно, в интерфейсе важно соблюдать несколько простых принципов:";
+
+        private static readonly string[] DemoListItems =
+        {
+            "Структурность и предсказуемость поведения элементов.",
+            "Привычную логику расположения управления и навигации.",
+            "Читаемость текста и понятные визуальные акценты.",
+            "Ровные отступы и аккуратные ритмы интерфейса."
+        };
+
+        private const string DemoCodeBlockText =
+            "Параметры рендера сообщения:\n" +
+            "- Абзацный интервал: 1.5\n" +
+            "- Цитаты: Markdown-style\n" +
+            "- Разметка: StackPanel + TextBlocks\n" +
+            "- Моноширинный текст: FontFamily = Consolas";
+
+        private const string DemoFinalParagraph =
+            "Маленькие штрихи создают ощущение завершённости и помогают пользователю чувствовать контроль. " +
+            "Когда система общается с ним так же аккуратно, как он работает в Revit, это вдохновляет двигаться дальше.";
 
         public ChatPanel()
         {
@@ -119,8 +146,8 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             UpdatePlaceholderVisibility();
             UpdateInputHeight();
 
-            // Эхо-ответ бота: два абзаца с «полуторным» интервалом
-            AddBotMessageSafe(EchoParagraph1, EchoParagraph2);
+            // Демонстрационный богатый ответ бота
+            AddDemoBotResponseSafe();
         }
 
         #endregion
@@ -141,29 +168,11 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             }
         }
 
-        private void AddBotMessageSafe(string? text)
+        private void AddDemoBotResponseSafe()
         {
-            if (string.IsNullOrWhiteSpace(text))
-                return;
-
             try
             {
-                AddBotMessage(text!);
-            }
-            catch
-            {
-            }
-        }
-
-        // Новый безопасный метод для двух абзацев
-        private void AddBotMessageSafe(string? paragraph1, string? paragraph2)
-        {
-            if (string.IsNullOrWhiteSpace(paragraph1) && string.IsNullOrWhiteSpace(paragraph2))
-                return;
-
-            try
-            {
-                AddBotMessage(paragraph1 ?? string.Empty, paragraph2 ?? string.Empty);
+                AddDemoBotResponse();
             }
             catch
             {
@@ -171,8 +180,8 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         }
 
         /// <summary>
-        /// Сообщение пользователя с одинаковыми «абзацными» интервалами, как у бота.
-        /// Каждая строка (Enter / Shift+Enter / перенос из Word) считается отдельным абзацем.
+        /// Сообщение пользователя с абзацным интервалом между строками,
+        /// как и в сообщениях бота.
         /// </summary>
         private void AddUserMessage(string text)
         {
@@ -251,69 +260,171 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             ScrollToBottom();
         }
 
-        // Старый универсальный вариант (одна строка текста бота)
-        private void AddBotMessage(string text)
+        /// <summary>
+        /// Богатый демонстрационный ответ бота:
+        /// заголовки, цитата, список, код-блок, абзацные интервалы.
+        /// </summary>
+        private void AddDemoBotResponse()
         {
-            if (text.Length > 2000)
-                text = text.Substring(0, 2000) + "...";
-
-            text = ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(text);
-
-            var bubble = new Border
-            {
-                Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
-                CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(10),
-                Margin = new Thickness(0, 0, 0, 10),
-                Child = new TextBlock
-                {
-                    Text = text,
-                    Foreground = Brushes.Black,
-                    TextWrapping = TextWrapping.Wrap
-                }
-            };
-
-            MessagesPanel?.Children.Add(bubble);
-            ScrollToBottom();
-        }
-
-        // Новый вариант – два абзаца с «полуторным» интервалом для бота
-        private void AddBotMessage(string paragraph1, string paragraph2)
-        {
-            if (paragraph1.Length > 2000)
-                paragraph1 = paragraph1.Substring(0, 2000) + "...";
-            if (paragraph2.Length > 2000)
-                paragraph2 = paragraph2.Substring(0, 2000) + "...";
-
-            paragraph1 = ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(paragraph1);
-            paragraph2 = ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(paragraph2);
+            if (MessagesPanel == null)
+                return;
 
             var stack = new StackPanel
             {
                 Orientation = Orientation.Vertical
             };
 
-            if (!string.IsNullOrWhiteSpace(paragraph1))
+            // Заголовок "Введение"
+            var introHeader = new TextBlock
             {
-                stack.Children.Add(new TextBlock
-                {
-                    Text = paragraph1,
-                    Foreground = Brushes.Black,
-                    TextWrapping = TextWrapping.Wrap
-                });
-            }
+                Text = " Введение",
+                FontWeight = FontWeights.Bold,
+                TextWrapping = TextWrapping.Wrap
+            };
+            stack.Children.Add(introHeader);
 
-            if (!string.IsNullOrWhiteSpace(paragraph2))
+            // Вводный абзац
+            var introText = new TextBlock
             {
-                stack.Children.Add(new TextBlock
+                Text = Hyphenate(DemoIntroParagraph),
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+            };
+            stack.Children.Add(introText);
+
+            // Разделитель
+            stack.Children.Add(CreateSeparator());
+
+            // Заголовок для цитаты
+            var quoteHeader = new TextBlock
+            {
+                Text = " Цитата из проекта",
+                FontWeight = FontWeights.Bold,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+            };
+            stack.Children.Add(quoteHeader);
+
+            // Цитата-блок
+            var quoteBorder = new Border
+            {
+                Background = new SolidColorBrush(Color.FromRgb(248, 248, 248)),
+                BorderThickness = new Thickness(3, 0, 0, 0),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(200, 200, 200)),
+                Padding = new Thickness(8, 6, 8, 6),
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+            };
+
+            var quoteStack = new StackPanel
+            {
+                Orientation = Orientation.Vertical
+            };
+
+            var quoteTitle = new TextBlock
+            {
+                Text = DemoQuoteHeader,
+                FontWeight = FontWeights.Bold,
+                TextWrapping = TextWrapping.Wrap
+            };
+            quoteStack.Children.Add(quoteTitle);
+
+            var quoteText = new TextBlock
+            {
+                Text = Hyphenate(DemoQuoteText),
+                FontStyle = FontStyles.Italic,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 4, 0, 0)
+            };
+            quoteStack.Children.Add(quoteText);
+
+            quoteBorder.Child = quoteStack;
+            stack.Children.Add(quoteBorder);
+
+            // Разделитель
+            stack.Children.Add(CreateSeparator());
+
+            // Заголовок "Основная часть"
+            var mainHeader = new TextBlock
+            {
+                Text = " Основная часть",
+                FontWeight = FontWeights.Bold,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+            };
+            stack.Children.Add(mainHeader);
+
+            // Основной абзац
+            var mainText = new TextBlock
+            {
+                Text = Hyphenate(DemoMainParagraph),
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+            };
+            stack.Children.Add(mainText);
+
+            // Список
+            var listStack = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+            };
+
+            foreach (var item in DemoListItems)
+            {
+                var tb = new TextBlock
                 {
-                    Text = paragraph2,
-                    Foreground = Brushes.Black,
+                    Text = "• " + Hyphenate(item),
                     TextWrapping = TextWrapping.Wrap,
-                    Margin = new Thickness(0, ParagraphSpacing, 0, 0)
-                });
+                    Margin = new Thickness(0, 2, 0, 0)
+                };
+                listStack.Children.Add(tb);
             }
 
+            stack.Children.Add(listStack);
+
+            // Разделитель
+            stack.Children.Add(CreateSeparator());
+
+            // Заголовок "Пример технического блока"
+            var codeHeader = new TextBlock
+            {
+                Text = " Пример технического блока",
+                FontWeight = FontWeights.Bold,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+            };
+            stack.Children.Add(codeHeader);
+
+            // Код-блок
+            var codeBorder = new Border
+            {
+                Background = new SolidColorBrush(Color.FromRgb(245, 245, 245)),
+                BorderThickness = new Thickness(1),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(210, 210, 210)),
+                Padding = new Thickness(8, 6, 8, 6),
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+            };
+
+            var codeText = new TextBlock
+            {
+                Text = DemoCodeBlockText,
+                FontFamily = new FontFamily("Consolas"),
+                TextWrapping = TextWrapping.Wrap
+            };
+            codeBorder.Child = codeText;
+
+            stack.Children.Add(codeBorder);
+
+            // Финальный абзац
+            var finalText = new TextBlock
+            {
+                Text = Hyphenate(DemoFinalParagraph),
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+            };
+            stack.Children.Add(finalText);
+
+            // Итоговый баббл
             var bubble = new Border
             {
                 Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
@@ -323,8 +434,23 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 Child = stack
             };
 
-            MessagesPanel?.Children.Add(bubble);
+            MessagesPanel.Children.Add(bubble);
             ScrollToBottom();
+        }
+
+        private static string Hyphenate(string text)
+        {
+            return ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(text);
+        }
+
+        private FrameworkElement CreateSeparator()
+        {
+            return new Border
+            {
+                Height = 1,
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0),
+                Background = new SolidColorBrush(Color.FromRgb(230, 230, 230))
+            };
         }
 
         private void ScrollToBottom()
