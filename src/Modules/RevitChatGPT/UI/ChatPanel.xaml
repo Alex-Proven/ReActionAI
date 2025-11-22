@@ -6,24 +6,28 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              d:DesignHeight="600"
-             d:DesignWidth="400">
+             d:DesignWidth="400"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
 
-    <!-- Styles -->
     <UserControl.Resources>
 
-        <!-- Base round button style -->
-        <Style x:Key="RoundButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
+        <!-- БАЗОВЫЙ стиль круглой кнопки -->
+        <Style x:Key="RoundButtonBase" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
+                                CornerRadius="100"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="999">
+                                BorderThickness="{TemplateBinding BorderThickness}">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>
                         </Border>
@@ -32,31 +36,33 @@
             </Setter>
         </Style>
 
-        <Style x:Key="ChatHeaderTextStyle" TargetType="TextBlock">
-            <Setter Property="TextWrapping" Value="Wrap"/>
+        <!-- Кнопка "+" 32 x 32 -->
+        <Style x:Key="PlusButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource RoundButtonBase}">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
         </Style>
 
-        <Style x:Key="ChatMessageTextStyle" TargetType="TextBlock">
-            <Setter Property="TextWrapping" Value="Wrap"/>
-        </Style>
-
-        <Style x:Key="NotificationTextStyle" TargetType="TextBlock">
-            <Setter Property="TextWrapping" Value="Wrap"/>
+        <!-- Кнопка "Отправить" 24 x 24 -->
+        <Style x:Key="SendButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource RoundButtonBase}">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
         </Style>
 
     </UserControl.Resources>
 
 
-    <Grid Background="#FFF8F8F8">
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <!-- Корень: футер докается вниз, контент занимает всё остальное -->
+    <DockPanel Background="#FFF8F8F8" LastChildFill="True">
 
-        <!-- Header -->
-        <Border Grid.Row="0" Background="#FFF2F2F2" Padding="12">
+        <!-- HEADER -->
+        <Border DockPanel.Dock="Top"
+                Background="#FFF2F2F2"
+                Padding="12">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -66,13 +72,11 @@
 
                 <Image Grid.Column="0"
                        Source="/ReActionAI.Modules.RevitChatGPT;component/Resources/icon32.png"
-                       Width="44"
-                       Height="44"
-                       Margin="0,0,10,0"
-                       Stretch="Uniform"/>
+                       Width="44" Height="44"
+                       Margin="0,0,10,0"/>
 
                 <TextBlock Grid.Column="1"
-                           Text="ReActionAI — ког&#x00AD;нитивный ас&#x00AD;систент для под&#x00AD;держки при&#x00AD;ня&#x00AD;тия про&#x00AD;ектных решений, повыш&#x00AD;ения эф&#x00AD;фек&#x00AD;тивности BIM-про&#x00AD;ек&#x00AD;ти&#x00AD;рования и опти&#x00AD;ми&#x00AD;за&#x00AD;ции про&#x00AD;ектных про&#x00AD;цессов"
+                           Text="ReActionAI — когнитивный ассистент для поддержки принятия проектных решений, повышения эффективности BIM-проектирования и оптимизации проектных процессов"
                            TextWrapping="Wrap"
                            TextAlignment="Justify"
                            IsHyphenationEnabled="True"
@@ -80,43 +84,33 @@
                            Foreground="#333333"
                            VerticalAlignment="Center"/>
 
+                <Button Grid.Column="2"
+                        Width="28" Height="28"
+                        ToolTip="Настройки"
+                        Cursor="Hand"
+                        VerticalAlignment="Center">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="Transparent"
+                                    CornerRadius="14"
+                                    BorderThickness="1"
+                                    BorderBrush="#E0E0E0">
+                                <TextBlock Text="" FontSize="14"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
             </Grid>
         </Border>
 
-        <!-- Messages area -->
-        <Border Grid.Row="1"
-                Margin="12,8,12,8"
-                Background="White"
-                CornerRadius="12"
-                BorderBrush="#E0E0E0"
-                BorderThickness="1">
 
-            <ScrollViewer x:Name="MessagesScrollViewer"
-                          VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled">
 
-                <StackPanel x:Name="MessagesPanel"
-                            Margin="12,8,12,8"
-                            Orientation="Vertical"
-                            VerticalAlignment="Top">
-
-                    <StackPanel.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextWrapping" Value="Wrap"/>
-                            <Setter Property="TextAlignment" Value="Justify"/>
-                            <Setter Property="IsHyphenationEnabled" Value="True"/>
-                        </Style>
-                    </StackPanel.Resources>
-
-                </StackPanel>
-
-            </ScrollViewer>
-
-        </Border>
-
-        <!-- Input and controls -->
-        <Border Grid.Row="2"
-                Margin="12,0,12,12"
+        <!-- FOOTER -->
+        <Border DockPanel.Dock="Bottom"
+                Margin="12,0,12,4.4"
                 Background="Transparent">
 
             <Grid>
@@ -125,38 +119,23 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- PLUS BUTTON -->
+                <!-- Кнопка "+" -->
                 <Button x:Name="PlusButton"
                         Grid.Column="0"
-                        Width="32"
-                        Height="32"
+                        VerticalAlignment="Bottom"
                         Margin="0,0,8,0"
-                        Background="White"
-                        BorderBrush="#E0E0E0"
-                        BorderThickness="1"
-                        Cursor="Hand">
-
-                    <Button.Style>
-                        <Style TargetType="Button"
-                               BasedOn="{StaticResource RoundButtonStyle}">
-                            <Setter Property="Background" Value="White"/>
-                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
-                            <Setter Property="BorderThickness" Value="1"/>
-                        </Style>
-                    </Button.Style>
-
+                        Style="{StaticResource PlusButtonStyle}">
                     <TextBlock Text="+"
                                FontSize="16"
                                FontWeight="Bold"
                                Foreground="Black"/>
-
                 </Button>
 
-                <!-- INPUT + SEND -->
-                <Grid Grid.Column="1">
 
+                <!-- Поле ввода + кнопка отправить -->
+                <Grid Grid.Column="1">
                     <Border x:Name="InputBorder"
-                            Background="#FFF4F4F4"
+                            Background="White"
                             BorderBrush="#E0E0E0"
                             BorderThickness="1"
                             CornerRadius="18"
@@ -186,39 +165,61 @@
                                        TextWrapping="Wrap"
                                        IsHitTestVisible="False"/>
 
+
+
+                            <!--  Кнопка «Отправить» с отступами:
+                                 Right = 4
+                                 Top = 4
+                                 Bottom = 4 -->
+                            <Button x:Name="SendButton"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Margin="0,4,4,4"
+                                    Style="{StaticResource SendButtonStyle}">
+                                <TextBlock Text="↑"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           Foreground="Black"/>
+                            </Button>
+
                         </Grid>
+
                     </Border>
-
-                    <!-- SEND BUTTON – NOW EXACTLY 24 × 24 -->
-                    <Button x:Name="SendButton"
-                            Width="24"
-                            Height="24"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Margin="0,0,4,0"
-                            Cursor="Hand">
-
-                        <Button.Style>
-                            <Style TargetType="Button"
-                                   BasedOn="{StaticResource RoundButtonStyle}">
-                                <Setter Property="Background" Value="White"/>
-                                <Setter Property="BorderBrush" Value="#E0E0E0"/>
-                                <Setter Property="BorderThickness" Value="1"/>
-                            </Style>
-                        </Button.Style>
-
-                        <TextBlock Text="↑"
-                                   FontSize="14"
-                                   FontWeight="Bold"
-                                   Foreground="Black"/>
-                    </Button>
-
                 </Grid>
 
             </Grid>
+        </Border>
+
+
+
+        <!-- СООБЩЕНИЯ -->
+        <Border Margin="12,8,12,8"
+                Background="White"
+                CornerRadius="12"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1">
+
+            <ScrollViewer x:Name="MessagesScrollViewer"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+
+                <StackPanel x:Name="MessagesPanel"
+                            Margin="12,8,12,8"
+                            Orientation="Vertical"
+                            VerticalAlignment="Top">
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="TextAlignment" Value="Justify"/>
+                            <Setter Property="IsHyphenationEnabled" Value="True"/>
+                        </Style>
+                    </StackPanel.Resources>
+                </StackPanel>
+
+            </ScrollViewer>
 
         </Border>
 
-    </Grid>
+    </DockPanel>
 
 </UserControl>
