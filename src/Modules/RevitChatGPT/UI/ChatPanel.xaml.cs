@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 
 namespace ReActionAI.Modules.RevitChatGPT.UI
 {
@@ -17,6 +18,20 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         // Межабзацный интервал для всех сообщений (бот и пользователь)
         private const double ParagraphSpacing = 6.0;
+
+        // Акцентные цвета варианта 1 (лёгкие, строгие)
+        private static readonly SolidColorBrush AccentBrush =
+            new SolidColorBrush(Color.FromRgb(0x3A, 0x78, 0xD1));     // #3A78D1
+        private static readonly SolidColorBrush AccentLightBrush =
+            new SolidColorBrush(Color.FromRgb(0xD9, 0xE7, 0xFA));     // #D9E7FA
+        private static readonly SolidColorBrush QuoteBorderBrush =
+            new SolidColorBrush(Color.FromRgb(0xA8, 0xC4, 0xF0));     // мягкий голубой
+        private static readonly SolidColorBrush QuoteBackgroundBrush =
+            new SolidColorBrush(Color.FromRgb(0xF5, 0xF7, 0xFC));     // почти белый с голубым
+        private static readonly SolidColorBrush CodeBackgroundBrush =
+            new SolidColorBrush(Color.FromRgb(0xF5, 0xF7, 0xFA));     // чуть холоднее
+        private static readonly SolidColorBrush CodeBorderBrush =
+            new SolidColorBrush(Color.FromRgb(0xCC, 0xD3, 0xE5));     // серо-голубой
 
         // Текстовые блоки демо-ответа бота
         private const string DemoIntroParagraph =
@@ -262,7 +277,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         /// <summary>
         /// Богатый демонстрационный ответ бота:
-        /// заголовки, цитата, список, код-блок, абзацные интервалы.
+        /// заголовки, цитата, список, код-блок, абзацные интервалы и лёгкие цветовые акценты.
         /// </summary>
         private void AddDemoBotResponse()
         {
@@ -279,7 +294,8 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             {
                 Text = " Введение",
                 FontWeight = FontWeights.Bold,
-                TextWrapping = TextWrapping.Wrap
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = AccentBrush
             };
             stack.Children.Add(introHeader);
 
@@ -301,18 +317,20 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 Text = " Цитата из проекта",
                 FontWeight = FontWeights.Bold,
                 TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0),
+                Foreground = AccentBrush
             };
             stack.Children.Add(quoteHeader);
 
             // Цитата-блок
             var quoteBorder = new Border
             {
-                Background = new SolidColorBrush(Color.FromRgb(248, 248, 248)),
-                BorderThickness = new Thickness(3, 0, 0, 0),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(200, 200, 200)),
-                Padding = new Thickness(8, 6, 8, 6),
-                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+                Background = QuoteBackgroundBrush,
+                BorderThickness = new Thickness(4, 0, 0, 0),
+                BorderBrush = QuoteBorderBrush,
+                Padding = new Thickness(10, 6, 8, 8),
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0),
+                CornerRadius = new CornerRadius(4)
             };
 
             var quoteStack = new StackPanel
@@ -349,7 +367,8 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 Text = " Основная часть",
                 FontWeight = FontWeights.Bold,
                 TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0),
+                Foreground = AccentBrush
             };
             stack.Children.Add(mainHeader);
 
@@ -373,10 +392,20 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             {
                 var tb = new TextBlock
                 {
-                    Text = "• " + Hyphenate(item),
+                    // маленький ромбик вместо точки, ромб окрашен в AccentBrush за счёт Run
                     TextWrapping = TextWrapping.Wrap,
                     Margin = new Thickness(0, 2, 0, 0)
                 };
+
+                var bulletRun = new System.Windows.Documents.Run("◆ ")
+                {
+                    Foreground = AccentBrush
+                };
+                var textRun = new System.Windows.Documents.Run(Hyphenate(item));
+
+                tb.Inlines.Add(bulletRun);
+                tb.Inlines.Add(textRun);
+
                 listStack.Children.Add(tb);
             }
 
@@ -391,18 +420,27 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 Text = " Пример технического блока",
                 FontWeight = FontWeights.Bold,
                 TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0),
+                Foreground = AccentBrush
             };
             stack.Children.Add(codeHeader);
 
             // Код-блок
             var codeBorder = new Border
             {
-                Background = new SolidColorBrush(Color.FromRgb(245, 245, 245)),
+                Background = CodeBackgroundBrush,
                 BorderThickness = new Thickness(1),
-                BorderBrush = new SolidColorBrush(Color.FromRgb(210, 210, 210)),
-                Padding = new Thickness(8, 6, 8, 6),
-                Margin = new Thickness(0, ParagraphSpacing, 0, 0)
+                BorderBrush = CodeBorderBrush,
+                Padding = new Thickness(10, 6, 10, 6),
+                Margin = new Thickness(0, ParagraphSpacing, 0, 0),
+                CornerRadius = new CornerRadius(6),
+                Effect = new DropShadowEffect
+                {
+                    Color = Colors.Black,
+                    BlurRadius = 4,
+                    ShadowDepth = 0,
+                    Opacity = 0.08
+                }
             };
 
             var codeText = new TextBlock
