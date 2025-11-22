@@ -152,7 +152,7 @@
                                      Foreground="#222222"
                                      AcceptsReturn="True"
                                      TextWrapping="Wrap"
-                                     VerticalScrollBarVisibility="Auto"
+                                     VerticalScrollBarVisibility="Hidden"
                                      MinHeight="24"/>
 
                             <TextBlock x:Name="InputPlaceholder"
@@ -197,7 +197,7 @@
                 BorderThickness="1">
 
             <ScrollViewer x:Name="MessagesScrollViewer"
-                          VerticalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Hidden"
                           HorizontalScrollBarVisibility="Disabled">
 
                 <StackPanel x:Name="MessagesPanel"

@@ -65,7 +65,7 @@
                     Margin="8,4,8,4"
                     BorderThickness="1"
                     BorderBrush="{DynamicResource PanelBorderBrush}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ScrollViewer VerticalScrollBarVisibility="Hidden">
                     <!-- Здесь могут быть сообщения чата -->
                     <StackPanel x:Name="MessagesContainer"
                                 Margin="6"
@@ -100,7 +100,7 @@
                              Grid.Column="0"
                              TextWrapping="Wrap"
                              AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto"
+                             VerticalScrollBarVisibility="Hidden"
                              MinHeight="40"
                              MaxHeight="120"
                              Margin="0,0,4,0"/>

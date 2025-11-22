@@ -258,7 +258,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             var hasFocus = InputBox.IsKeyboardFocused;
 
             InputPlaceholder.Visibility =
-                (hasText || hasFocus) ? Visibility.Collapsed : Visibility.Visible;
+                (hasText || hasFocus) ? Visibility.Collapsed : Visibility.Hidden;
         }
 
         /// <summary>
@@ -277,7 +277,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             // Управляем скроллом:
             // до 20 строк — скролл скрыт, после 20 — показываем
             if (totalLines > InputMaxLines)
-                InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
             else
                 InputBox.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
 
