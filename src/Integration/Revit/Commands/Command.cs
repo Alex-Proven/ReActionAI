@@ -1,29 +1,33 @@
+using System;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using System;
 
 namespace ReActionAI.Integration.Revit.Commands
 {
     [Transaction(TransactionMode.Manual)]
-    public class OpenPanelCommand : IExternalCommand
+    public class Command : IExternalCommand
     {
-        // Тот же GUID, что и в App.ChatPanelGuid
-        private static readonly Guid ChatPanelGuid = new("6F2F9E1C-5A5C-4DB4-9E8A-2B840D433E52");
-
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public Result Execute(
+            ExternalCommandData commandData,
+            ref string message,
+            ElementSet elements)
         {
+            var uiApp = commandData.Application;
+
+            App.EnsureThemeSubscription(uiApp);
+
             try
             {
-                var dpId = new DockablePaneId(ChatPanelGuid);
-                var pane = commandData.Application.GetDockablePane(dpId);
+                // Открываем нашу док-панель по ID из App
+                DockablePane pane = uiApp.GetDockablePane(App.ChatPaneId);
+                pane.Show();   // В Revit 2024 другого метода нет
 
-                pane.Show();
                 return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                TaskDialog.Show("ReActionAI", $"Ошибка: {ex.Message}");
+                message = "Не удалось открыть док-панель ChatGPT: " + ex.Message;
                 return Result.Failed;
             }
         }
