@@ -6,9 +6,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
+using System.Windows.Documents;
 
 namespace ReActionAI.Modules.RevitChatGPT.UI
 {
+    /// <summary>
+    /// Панель чата ReActionAI с двумя вариантами оформления:
+    /// 1) монохромный (вариант 1),
+    /// 2) мягкие цветные акценты (вариант 2).
+    /// Переключение временно выполняется по кнопке "+".
+    /// </summary>
     public partial class ChatPanel : UserControl
     {
         private const double InputMinHeight = 36.0;
@@ -19,21 +26,67 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         // Межабзацный интервал для всех сообщений (бот и пользователь)
         private const double ParagraphSpacing = 6.0;
 
-        // Акцентные цвета варианта 1 (лёгкие, строгие)
-        private static readonly SolidColorBrush AccentBrush =
-            new SolidColorBrush(Color.FromRgb(0x3A, 0x78, 0xD1));     // #3A78D1
-        private static readonly SolidColorBrush AccentLightBrush =
-            new SolidColorBrush(Color.FromRgb(0xD9, 0xE7, 0xFA));     // #D9E7FA
-        private static readonly SolidColorBrush QuoteBorderBrush =
-            new SolidColorBrush(Color.FromRgb(0xA8, 0xC4, 0xF0));     // мягкий голубой
-        private static readonly SolidColorBrush QuoteBackgroundBrush =
-            new SolidColorBrush(Color.FromRgb(0xF5, 0xF7, 0xFC));     // почти белый с голубым
-        private static readonly SolidColorBrush CodeBackgroundBrush =
-            new SolidColorBrush(Color.FromRgb(0xF5, 0xF7, 0xFA));     // чуть холоднее
-        private static readonly SolidColorBrush CodeBorderBrush =
-            new SolidColorBrush(Color.FromRgb(0xCC, 0xD3, 0xE5));     // серо-голубой
+        #region Темы
 
-        // Текстовые блоки демо-ответа бота
+        private enum ChatTheme
+        {
+            Mono,   // вариант 1 — чёрно-белый
+            Color   // вариант 2 — текущий цветной
+        }
+
+        // Стартуем с уже проверенного цветного варианта 2
+        private ChatTheme _currentTheme = ChatTheme.Color;
+
+        // Палитра цветной темы (вариант 2)
+        private static readonly SolidColorBrush AccentBrushColor =
+            new SolidColorBrush(Color.FromRgb(0x3A, 0x78, 0xD1));     // #3A78D1
+        private static readonly SolidColorBrush AccentLightBrushColor =
+            new SolidColorBrush(Color.FromRgb(0xD9, 0xE7, 0xFA));     // #D9E7FA
+        private static readonly SolidColorBrush QuoteBorderBrushColor =
+            new SolidColorBrush(Color.FromRgb(0xA8, 0xC4, 0xF0));     // мягкий голубой
+        private static readonly SolidColorBrush QuoteBackgroundBrushColor =
+            new SolidColorBrush(Color.FromRgb(0xF5, 0xF7, 0xFC));     // почти белый с голубым
+        private static readonly SolidColorBrush CodeBackgroundBrushColor =
+            new SolidColorBrush(Color.FromRgb(0xF5, 0xF7, 0xFA));     // чуть холоднее
+        private static readonly SolidColorBrush CodeBorderBrushColor =
+            new SolidColorBrush(Color.FromRgb(0xCC, 0xD3, 0xE5));     // серо-голубой
+        private static readonly SolidColorBrush UserBubbleBackgroundColor =
+            new SolidColorBrush(Color.FromRgb(220, 240, 255));        // как в варианте 2
+        private static readonly SolidColorBrush BotBubbleBackgroundColor =
+            new SolidColorBrush(Color.FromRgb(240, 240, 240));
+
+        // Палитра монохромной темы (вариант 1)
+        private static readonly SolidColorBrush AccentBrushMono =
+            new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33));     // тёмно-серый
+        private static readonly SolidColorBrush AccentLightBrushMono =
+            new SolidColorBrush(Color.FromRgb(0xEE, 0xEE, 0xEE));     // светло-серый
+        private static readonly SolidColorBrush QuoteBorderBrushMono =
+            new SolidColorBrush(Color.FromRgb(0xC0, 0xC0, 0xC0));
+        private static readonly SolidColorBrush QuoteBackgroundBrushMono =
+            new SolidColorBrush(Color.FromRgb(0xF5, 0xF5, 0xF5));
+        private static readonly SolidColorBrush CodeBackgroundBrushMono =
+            new SolidColorBrush(Color.FromRgb(0xF2, 0xF2, 0xF2));
+        private static readonly SolidColorBrush CodeBorderBrushMono =
+            new SolidColorBrush(Color.FromRgb(0xDD, 0xDD, 0xDD));
+        private static readonly SolidColorBrush UserBubbleBackgroundMono =
+            new SolidColorBrush(Color.FromRgb(230, 230, 230));
+        private static readonly SolidColorBrush BotBubbleBackgroundMono =
+            new SolidColorBrush(Color.FromRgb(245, 245, 245));
+
+        // Свойства, которые отдают нужные кисти в зависимости от текущей темы
+        private Brush AccentBrush => _currentTheme == ChatTheme.Color ? AccentBrushColor : AccentBrushMono;
+        private Brush AccentLightBrush => _currentTheme == ChatTheme.Color ? AccentLightBrushColor : AccentLightBrushMono;
+        private Brush QuoteBorderBrush => _currentTheme == ChatTheme.Color ? QuoteBorderBrushColor : QuoteBorderBrushMono;
+        private Brush QuoteBackgroundBrush => _currentTheme == ChatTheme.Color ? QuoteBackgroundBrushColor : QuoteBackgroundBrushMono;
+        private Brush CodeBackgroundBrush => _currentTheme == ChatTheme.Color ? CodeBackgroundBrushColor : CodeBackgroundBrushMono;
+        private Brush CodeBorderBrush => _currentTheme == ChatTheme.Color ? CodeBorderBrushColor : CodeBorderBrushMono;
+        private Brush UserBubbleBackground => _currentTheme == ChatTheme.Color ? UserBubbleBackgroundColor : UserBubbleBackgroundMono;
+        private Brush BotBubbleBackground => _currentTheme == ChatTheme.Color ? BotBubbleBackgroundColor : BotBubbleBackgroundMono;
+
+        #endregion
+
+        #region Демо-текст
+
         private const string DemoIntroParagraph =
             "Иногда интерфейсу не хватает всего одного аккуратного штриха, чтобы он стал понятнее и " +
             "приятнее в использовании. Такие детали формируют ощущение стабильности и продуманности системы.";
@@ -69,11 +122,14 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             "Маленькие штрихи создают ощущение завершённости и помогают пользователю чувствовать контроль. " +
             "Когда система общается с ним так же аккуратно, как он работает в Revit, это вдохновляет двигаться дальше.";
 
+        #endregion
+
         public ChatPanel()
         {
             InitializeComponent();
 
-            ApplyRevitTheme(isDark: false);
+            // стартовая тема — цветная, как в последнем пуше
+            ApplyTheme(ChatTheme.Color);
 
             if (InputBox != null)
             {
@@ -110,7 +166,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         private void InputBox_KeyDown(object sender, KeyEventArgs e)
         {
             // Enter без Shift – отправка сообщения
-            // Shift+Enter – новая строка внутри того же сообщения
+            // Shift+Enter – новая строка
             if (e.Key == Key.Enter && (Keyboard.Modifiers & ModifierKeys.Shift) == 0)
             {
                 e.Handled = true;
@@ -122,8 +178,8 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
         {
             try
             {
-                // Заглушка для будущего функционала кнопки "+"
-                MessageBox.Show("Кнопка + нажата");
+                // Временно: переключаем тему по кнопке "+"
+                ToggleTheme();
             }
             catch
             {
@@ -167,7 +223,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         #endregion
 
-        #region Добавление сообщений
+        #region Сообщения
 
         private void AddUserMessageSafe(string? text)
         {
@@ -194,16 +250,11 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             }
         }
 
-        /// <summary>
-        /// Сообщение пользователя с абзацным интервалом между строками,
-        /// как и в сообщениях бота.
-        /// </summary>
         private void AddUserMessage(string text)
         {
             if (text.Length > 1000)
                 text = text.Substring(0, 1000) + "...";
 
-            // Нормализуем переводы строк и разбиваем по каждой строке
             var lines = text
                 .Replace("\r\n", "\n")
                 .Split('\n')
@@ -212,12 +263,12 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
             if (lines.Length <= 1)
             {
-                // Один абзац — старое поведение
-                string hyphenated = ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(text);
+                string hyphenated = Hyphenate(text);
 
                 var singleBubble = new Border
                 {
-                    Background = new SolidColorBrush(Color.FromRgb(220, 240, 255)),
+                    Tag = "user",                     // помечаем как пользователь
+                    Background = UserBubbleBackground,
                     CornerRadius = new CornerRadius(8),
                     Padding = new Thickness(10),
                     Margin = new Thickness(0, 0, 0, 10),
@@ -234,7 +285,6 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 return;
             }
 
-            // Несколько строк — каждая как абзац с интервалом ParagraphSpacing
             var stack = new StackPanel
             {
                 Orientation = Orientation.Vertical
@@ -243,11 +293,10 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             for (int i = 0; i < lines.Length; i++)
             {
                 string line = lines[i];
-
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
 
-                line = ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(line);
+                line = Hyphenate(line);
 
                 var tb = new TextBlock
                 {
@@ -264,7 +313,8 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
             var bubble = new Border
             {
-                Background = new SolidColorBrush(Color.FromRgb(220, 240, 255)),
+                Tag = "user",
+                Background = UserBubbleBackground,
                 CornerRadius = new CornerRadius(8),
                 Padding = new Thickness(10),
                 Margin = new Thickness(0, 0, 0, 10),
@@ -275,10 +325,6 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             ScrollToBottom();
         }
 
-        /// <summary>
-        /// Богатый демонстрационный ответ бота:
-        /// заголовки, цитата, список, код-блок, абзацные интервалы и лёгкие цветовые акценты.
-        /// </summary>
         private void AddDemoBotResponse()
         {
             if (MessagesPanel == null)
@@ -289,7 +335,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 Orientation = Orientation.Vertical
             };
 
-            // Заголовок "Введение"
+            // Введение
             var introHeader = new TextBlock
             {
                 Text = " Введение",
@@ -299,7 +345,6 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             };
             stack.Children.Add(introHeader);
 
-            // Вводный абзац
             var introText = new TextBlock
             {
                 Text = Hyphenate(DemoIntroParagraph),
@@ -308,10 +353,9 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             };
             stack.Children.Add(introText);
 
-            // Разделитель
             stack.Children.Add(CreateSeparator());
 
-            // Заголовок для цитаты
+            // Цитата
             var quoteHeader = new TextBlock
             {
                 Text = " Цитата из проекта",
@@ -322,7 +366,6 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             };
             stack.Children.Add(quoteHeader);
 
-            // Цитата-блок
             var quoteBorder = new Border
             {
                 Background = QuoteBackgroundBrush,
@@ -333,10 +376,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
                 CornerRadius = new CornerRadius(4)
             };
 
-            var quoteStack = new StackPanel
-            {
-                Orientation = Orientation.Vertical
-            };
+            var quoteStack = new StackPanel { Orientation = Orientation.Vertical };
 
             var quoteTitle = new TextBlock
             {
@@ -358,10 +398,9 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             quoteBorder.Child = quoteStack;
             stack.Children.Add(quoteBorder);
 
-            // Разделитель
             stack.Children.Add(CreateSeparator());
 
-            // Заголовок "Основная часть"
+            // Основная часть
             var mainHeader = new TextBlock
             {
                 Text = " Основная часть",
@@ -372,7 +411,6 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             };
             stack.Children.Add(mainHeader);
 
-            // Основной абзац
             var mainText = new TextBlock
             {
                 Text = Hyphenate(DemoMainParagraph),
@@ -381,7 +419,6 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             };
             stack.Children.Add(mainText);
 
-            // Список
             var listStack = new StackPanel
             {
                 Orientation = Orientation.Vertical,
@@ -392,16 +429,15 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             {
                 var tb = new TextBlock
                 {
-                    // маленький ромбик вместо точки, ромб окрашен в AccentBrush за счёт Run
                     TextWrapping = TextWrapping.Wrap,
                     Margin = new Thickness(0, 2, 0, 0)
                 };
 
-                var bulletRun = new System.Windows.Documents.Run("◆ ")
+                var bulletRun = new Run("◆ ")
                 {
                     Foreground = AccentBrush
                 };
-                var textRun = new System.Windows.Documents.Run(Hyphenate(item));
+                var textRun = new Run(Hyphenate(item));
 
                 tb.Inlines.Add(bulletRun);
                 tb.Inlines.Add(textRun);
@@ -411,10 +447,9 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
             stack.Children.Add(listStack);
 
-            // Разделитель
             stack.Children.Add(CreateSeparator());
 
-            // Заголовок "Пример технического блока"
+            // Код-блок
             var codeHeader = new TextBlock
             {
                 Text = " Пример технического блока",
@@ -425,7 +460,6 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             };
             stack.Children.Add(codeHeader);
 
-            // Код-блок
             var codeBorder = new Border
             {
                 Background = CodeBackgroundBrush,
@@ -462,10 +496,10 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
             };
             stack.Children.Add(finalText);
 
-            // Итоговый баббл
             var bubble = new Border
             {
-                Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)),
+                Tag = "bot",                  // помечаем как бот
+                Background = BotBubbleBackground,
                 CornerRadius = new CornerRadius(8),
                 Padding = new Thickness(10),
                 Margin = new Thickness(0, 0, 0, 10),
@@ -504,7 +538,7 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         #endregion
 
-        #region Плейсхолдер и авто-высота ввода
+        #region Плейсхолдер и высота ввода
 
         private void UpdatePlaceholderVisibility()
         {
@@ -562,7 +596,103 @@ namespace ReActionAI.Modules.RevitChatGPT.UI
 
         #endregion
 
-        #region Тема
+        #region Применение темы
+
+        private void ToggleTheme()
+        {
+            _currentTheme = _currentTheme == ChatTheme.Color
+                ? ChatTheme.Mono
+                : ChatTheme.Color;
+
+            ApplyTheme(_currentTheme);
+        }
+
+        private void ApplyTheme(ChatTheme theme)
+        {
+            _currentTheme = theme;
+
+            // пока у нас только светлая ревитовская тема
+            ApplyRevitTheme(isDark: false);
+
+            // перекрашиваем уже существующие сообщения согласно новой теме
+            RecolorExistingMessages();
+        }
+
+        private void RecolorExistingMessages()
+        {
+            if (MessagesPanel == null)
+                return;
+
+            foreach (var child in MessagesPanel.Children)
+            {
+                if (child is DependencyObject d)
+                    RecolorElementRecursive(d);
+            }
+        }
+
+        private void RecolorElementRecursive(DependencyObject element)
+        {
+            if (element == null)
+                return;
+
+            // Border: пузырьки, цитата, код-блок
+            if (element is Border border)
+            {
+                if (border.Tag is string tag)
+                {
+                    if (string.Equals(tag, "user", StringComparison.OrdinalIgnoreCase))
+                        border.Background = UserBubbleBackground;
+                    else if (string.Equals(tag, "bot", StringComparison.OrdinalIgnoreCase))
+                        border.Background = BotBubbleBackground;
+                }
+
+                // рамка цитаты / код-блока
+                if (border.BorderBrush is SolidColorBrush bb)
+                {
+                    if (bb.Color == QuoteBorderBrushColor.Color || bb.Color == QuoteBorderBrushMono.Color)
+                        border.BorderBrush = QuoteBorderBrush;
+                    else if (bb.Color == CodeBorderBrushColor.Color || bb.Color == CodeBorderBrushMono.Color)
+                        border.BorderBrush = CodeBorderBrush;
+                }
+
+                // фон цитаты / код-блока
+                if (border.Background is SolidColorBrush bg)
+                {
+                    if (bg.Color == QuoteBackgroundBrushColor.Color || bg.Color == QuoteBackgroundBrushMono.Color)
+                        border.Background = QuoteBackgroundBrush;
+                    else if (bg.Color == CodeBackgroundBrushColor.Color || bg.Color == CodeBackgroundBrushMono.Color)
+                        border.Background = CodeBackgroundBrush;
+                }
+            }
+
+            // TextBlock: заголовки, обычный текст, элементы списка
+            if (element is TextBlock tb)
+            {
+                if (tb.Foreground is SolidColorBrush fg &&
+                    (fg.Color == AccentBrushColor.Color || fg.Color == AccentBrushMono.Color))
+                {
+                    tb.Foreground = AccentBrush;
+                }
+
+                // Отдельно перекрашиваем Inline-элементы (маркеры ◆)
+                foreach (var inline in tb.Inlines)
+                {
+                    if (inline is Run run && run.Foreground is SolidColorBrush rfg &&
+                        (rfg.Color == AccentBrushColor.Color || rfg.Color == AccentBrushMono.Color))
+                    {
+                        run.Foreground = AccentBrush;
+                    }
+                }
+            }
+
+            // Рекурсивный обход визуального дерева
+            int count = VisualTreeHelper.GetChildrenCount(element);
+            for (int i = 0; i < count; i++)
+            {
+                var child = VisualTreeHelper.GetChild(element, i);
+                RecolorElementRecursive(child);
+            }
+        }
 
         private void ApplyRevitTheme(bool isDark)
         {

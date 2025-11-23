@@ -76,7 +76,7 @@
                        Margin="0,0,10,0"/>
 
                 <TextBlock Grid.Column="1"
-                           Text="ReActionAI — когнитивный ассистент для поддержки принятия проектных решений, повышения эффективности BIM-проектирования и оптимизации проектных процессов"
+                           Text="ReActionAI — когнитивный ассистент для повышения эффективности BIM-проектирования и оптимизации проектных процессов"
                            TextWrapping="Wrap"
                            TextAlignment="Justify"
                            IsHyphenationEnabled="True"

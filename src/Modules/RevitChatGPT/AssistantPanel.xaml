@@ -7,13 +7,13 @@
              d:DesignWidth="350"
              d:DesignHeight="600">
 
-    <!-- Общие ресурсы (можно перенести в App.xaml) -->
+    <!-- Локальные ресурсы панели, без внешних словарей -->
     <UserControl.Resources>
-        <!-- Фон панели (будет подменяться темой) -->
+        <!-- Фон панели и рамка -->
         <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#FFF5F5F5"/>
         <SolidColorBrush x:Key="PanelBorderBrush" Color="#FFCCCCCC"/>
 
-        <!-- Футер (контейнер ввода + кнопки) -->
+        <!-- Футер (поле ввода + кнопки) -->
         <SolidColorBrush x:Key="FooterBackgroundBrush" Color="#FFFFFFFF"/>
         <SolidColorBrush x:Key="FooterBorderBrush" Color="#FFDDDDDD"/>
 
@@ -21,7 +21,7 @@
         <SolidColorBrush x:Key="HeaderTextBrush" Color="#FF333333"/>
         <SolidColorBrush x:Key="BodyTextBrush" Color="#FF222222"/>
 
-        <!-- Кнопки -->
+        <!-- Стиль кнопок футера -->
         <Style x:Key="FooterButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="4,0,0,0"/>
             <Setter Property="Padding" Value="10,4"/>
@@ -29,16 +29,16 @@
         </Style>
     </UserControl.Resources>
 
-    <Border Background="{DynamicResource PanelBackgroundBrush}"
-            BorderBrush="{DynamicResource PanelBorderBrush}"
+    <Border Background="{StaticResource PanelBackgroundBrush}"
+            BorderBrush="{StaticResource PanelBorderBrush}"
             BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
-                <!-- Заголовок -->
+                <!-- Шапка -->
                 <RowDefinition Height="Auto"/>
-                <!-- Основная область (чат / контент ассистента) -->
+                <!-- Основная область -->
                 <RowDefinition Height="*"/>
-                <!-- Футер: поле ввода + кнопки -->
+                <!-- Футер -->
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
@@ -46,66 +46,70 @@
             <Border Grid.Row="0"
                     Padding="8"
                     BorderThickness="0,0,0,1"
-                    BorderBrush="{DynamicResource PanelBorderBrush}">
-                <StackPanel>
-                    <TextBlock Text="ReActionAI"
-                               FontSize="16"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource HeaderTextBrush}"/>
-                    <TextBlock Text="Когнитивный ассистент для поддержки принятия проектных решений, повышения эффективности BIM-проектирования и оптимизации проектных процессов"
-                               TextWrapping="Wrap"
-                               Margin="0,4,0,0"
-                               Foreground="{DynamicResource BodyTextBrush}"
-                               FontSize="11"/>
+                    BorderBrush="{StaticResource PanelBorderBrush}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                    <!-- Лого -->
+                    <Image Width="32"
+                           Height="32"
+                           Margin="0,0,10,0"
+                           Source="/ReActionAI.Modules.RevitChatGPT;component/Resources/icon32.png"/>
+
+                    <!-- Текстовая часть -->
+                    <StackPanel Orientation="Vertical"
+                                VerticalAlignment="Center">
+
+                        <!-- Заголовок: текст задаём в .cs с переносом по слогам -->
+                        <TextBlock x:Name="HeaderTitle"
+                                   TextWrapping="Wrap"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource HeaderTextBrush}"/>
+
+                        <!-- Описание: тоже через Hyphenator -->
+                        <TextBlock x:Name="HeaderDescription"
+                                   TextWrapping="Wrap"
+                                   Margin="0,4,0,0"
+                                   FontSize="11"
+                                   Foreground="{StaticResource BodyTextBrush}"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
 
-            <!-- ====== ОСНОВНОЙ КОНТЕНТ (ЧАТ) ====== -->
+            <!-- ====== ОСНОВНОЙ КОНТЕНТ (ЧАТ / ОПИСАНИЕ) ====== -->
             <Border Grid.Row="1"
                     Margin="8,4,8,4"
                     BorderThickness="1"
-                    BorderBrush="{DynamicResource PanelBorderBrush}">
-                <ScrollViewer VerticalScrollBarVisibility="Hidden">
-                    <!-- Здесь могут быть сообщения чата -->
-                    <StackPanel x:Name="MessagesContainer"
-                                Margin="6"
-                                Orientation="Vertical">
-                        <!-- Пример сообщения -->
-                        <TextBlock Text="Здесь будут появляться сообщения ассистента и пользователя."
-                                   TextWrapping="Wrap"
-                                   Foreground="{DynamicResource BodyTextBrush}"/>
-                    </StackPanel>
+                    BorderBrush="{StaticResource PanelBorderBrush}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBlock Margin="8"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource BodyTextBrush}"
+                               Text="Контент ассистента будет размещён здесь."/>
                 </ScrollViewer>
             </Border>
 
-            <!-- ====== ФУТЕР: ПОЛЕ ВВОДА + КНОПКИ ====== -->
-            <!-- ВАЖНО: Margin снизу 4.4 — «прилеплено» к низу контейнера -->
+            <!-- ====== ФУТЕР (поле ввода + кнопки) ====== -->
             <Border Grid.Row="2"
-                    Margin="8,0,8,4.4"
-                    Padding="6"
-                    Background="{DynamicResource FooterBackgroundBrush}"
-                    BorderBrush="{DynamicResource FooterBorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="6">
-                <Grid>
+                    Background="{StaticResource FooterBackgroundBrush}"
+                    BorderThickness="0,1,0,0"
+                    BorderBrush="{StaticResource FooterBorderBrush}">
+                <Grid Margin="4">
                     <Grid.ColumnDefinitions>
-                        <!-- Поле ввода тянется -->
                         <ColumnDefinition Width="*"/>
-                        <!-- Блок кнопок по ширине содержимого -->
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Поле ввода текста -->
-                    <TextBox x:Name="InputTextBox"
+                    <!-- Поле ввода -->
+                    <TextBox x:Name="InputBox"
                              Grid.Column="0"
-                             TextWrapping="Wrap"
+                             Margin="0,0,4,0"
+                             VerticalAlignment="Stretch"
                              AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Hidden"
-                             MinHeight="40"
-                             MaxHeight="120"
-                             Margin="0,0,4,0"/>
+                             TextWrapping="Wrap"
+                             MinHeight="30"/>
 
-                    <!-- Кнопки справа, «приклеены» к тому же футеру -->
+                    <!-- Кнопки -->
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right"
