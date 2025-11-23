@@ -3,56 +3,212 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using ReActionAI.Abstractions;
+using ReActionAI.Modules.RevitChatGPT.Config;
 
 namespace ReActionAI.Modules.RevitChatGPT.Services
 {
     public class ChatClient : IChatClient, IChatService
     {
-        private readonly HttpClient _http = new HttpClient();
-        private readonly string _apiKey;
-        private readonly string _model;
+        private const string DefaultModel = "gpt-4o-mini";
+        private const string PlaceholderApiKey = "PUT_YOUR_OPENAI_KEY_HERE";
+
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+
+        private readonly HttpClient _http = default!;
+        private readonly string _apiKey = string.Empty;
+        private readonly string _model = DefaultModel;
 
         public ChatClient()
+            : this(ConfigProvider.Load())
         {
-            var cfg = Config.ConfigProvider.Load();
-            _apiKey = cfg.ApiKey ?? "PUT_YOUR_OPENAI_KEY_HERE";
-            _model = cfg.Model ?? "gpt-4o-mini";
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
-            _http.Timeout = TimeSpan.FromSeconds(60);
         }
 
-        public async Task<string> SendAsync(string prompt) => await AskAsync(prompt);
+        public ChatClient(AppConfig config)
+        {
+            config ??= new AppConfig();
+            config.ApplyDefaults();
+
+            var apiKey = config.ApiKey;
+            var envKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+            if (!string.IsNullOrWhiteSpace(envKey))
+                apiKey = envKey;
+
+            _apiKey = apiKey ?? string.Empty;
+            _model = string.IsNullOrWhiteSpace(config.Model) ? DefaultModel : config.Model!;
+
+            _http = new()
+            {
+                BaseAddress = new Uri("https://api.openai.com/v1/"),
+                Timeout = TimeSpan.FromSeconds(45)
+            };
+        }
+
+        public Task<string> SendAsync(string prompt) => AskAsync(prompt);
 
         public async Task<string> AskAsync(string input)
         {
-            var payload = new
+            if (string.IsNullOrWhiteSpace(input))
+                return string.Empty;
+
+            if (!IsApiKeyConfigured())
             {
-                model = _model,
-                messages = new[]
-                {
-                    new { role = "system", content = "You are a helpful assistant inside Autodesk Revit." },
-                    new { role = "user", content = input }
-                }
+                return "Ошибка конфигурации: OpenAI API key не настроен. " +
+                       "Укажите ключ в файле Config/appsettings.json в поле \"ApiKey\".";
+            }
+
+            var request = new ChatCompletionRequest
+            {
+                Model = _model,
+                Messages =
+                [
+                    new ChatMessage
+                    {
+                        Role = "system",
+                        Content = "You are a helpful assistant inside Autodesk Revit."
+                    },
+                    new ChatMessage
+                    {
+                        Role = "user",
+                        Content = input
+                    }
+                ],
+                Temperature = 0.2
             };
 
-            var json = JsonSerializer.Serialize(payload);
-            var req = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
-            req.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "chat/completions")
+            {
+                Content = new StringContent(
+                    JsonSerializer.Serialize(request, JsonOptions),
+                    Encoding.UTF8,
+                    "application/json")
+            };
 
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            httpRequest.Headers.Accept.Clear();
+            httpRequest.Headers.Accept.ParseAdd("application/json");
+
+            HttpResponseMessage response;
             try
             {
-                var res = await _http.SendAsync(req);
-                var body = await res.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(body);
-                var content = doc.RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
-                return content ?? "(empty)";
+                response = await _http.SendAsync(httpRequest).ConfigureAwait(false);
+            }
+            catch (TaskCanceledException)
+            {
+                return "Ошибка: превышено время ожидания ответа от сервера OpenAI.";
             }
             catch (Exception ex)
             {
                 return $"Error: {ex.Message}";
             }
+
+            var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var message = $"Error: OpenAI API вернул статус {(int)response.StatusCode} ({response.ReasonPhrase}).";
+
+                try
+                {
+                    var errorDoc = JsonSerializer.Deserialize<OpenAiErrorResponse>(responseText, JsonOptions);
+                    var apiMessage = errorDoc?.Error?.Message;
+                    if (!string.IsNullOrWhiteSpace(apiMessage))
+                        message += " " + apiMessage;
+                }
+                catch
+                {
+                    // ignore
+                }
+
+                return message;
+            }
+
+            try
+            {
+                var completion = JsonSerializer.Deserialize<ChatCompletionResponse>(responseText, JsonOptions);
+                var choices = completion?.Choices;
+
+                if (choices != null && choices.Length > 0)
+                {
+                    var msg = choices[0]?.Message;
+                    var content = msg?.Content;
+
+                    if (!string.IsNullOrWhiteSpace(content))
+                        return content!.Trim();
+                }
+
+                return "(empty)";
+            }
+            catch (Exception ex)
+            {
+                return $"Error: failed to parse OpenAI response. {ex.Message}";
+            }
         }
+
+        private bool IsApiKeyConfigured()
+        {
+            if (string.IsNullOrWhiteSpace(_apiKey))
+                return false;
+
+            if (string.Equals(_apiKey.Trim(), PlaceholderApiKey, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            return true;
+        }
+
+        #region DTOs
+
+        private sealed class ChatCompletionRequest
+        {
+            [JsonPropertyName("model")]
+            public string? Model { get; set; }
+
+            [JsonPropertyName("messages")]
+            public ChatMessage[] Messages { get; set; } = [];
+
+            [JsonPropertyName("temperature")]
+            public double Temperature { get; set; }
+        }
+
+        private sealed class ChatMessage
+        {
+            [JsonPropertyName("role")]
+            public string? Role { get; set; }
+
+            [JsonPropertyName("content")]
+            public string? Content { get; set; }
+        }
+
+        private sealed class ChatCompletionResponse
+        {
+            [JsonPropertyName("choices")]
+            public ChatChoice[]? Choices { get; set; }
+        }
+
+        private sealed class ChatChoice
+        {
+            [JsonPropertyName("message")]
+            public ChatMessage? Message { get; set; }
+        }
+
+        private sealed class OpenAiErrorResponse
+        {
+            [JsonPropertyName("error")]
+            public OpenAiError? Error { get; set; }
+        }
+
+        private sealed class OpenAiError
+        {
+            [JsonPropertyName("message")]
+            public string? Message { get; set; }
+        }
+
+        #endregion
     }
 }
