@@ -6,9 +6,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using ReActionAI.Abstractions;
-using ReActionAI.Modules.RevitChatGPT.Config;
+using ReActionAI.Integration.Revit.Config;
 
-namespace ReActionAI.Modules.RevitChatGPT.Services
+namespace ReActionAI.Integration.Revit.Services
 {
     public class ChatClient : IChatClient, IChatService
     {

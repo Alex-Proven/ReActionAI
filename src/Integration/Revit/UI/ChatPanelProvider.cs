@@ -1,27 +1,30 @@
 using Autodesk.Revit.UI;
 
-namespace ReActionAI.Modules.RevitChatGPT.UI
+namespace ReActionAI.Integration.Revit.UI
 {
     public class ChatPanelProvider : IDockablePaneProvider
     {
         private readonly ChatPanel _panel;
 
-        public ChatPanelProvider(ChatPanel panel)
+        public ChatPanelProvider()
         {
-            _panel = panel;
+            _panel = new ChatPanel();
         }
 
-        // При желании можно получать доступ к панели извне
         public ChatPanel Panel => _panel;
 
         public void SetupDockablePane(DockablePaneProviderData data)
         {
             data.FrameworkElement = _panel;
-
             data.InitialState = new DockablePaneState
             {
-                DockPosition = DockPosition.Right
+                DockPosition = DockPosition.Tabbed
             };
+        }
+
+        public void AddMessage(string author, string? message)
+        {
+            _panel.AddMessage(author, message);
         }
     }
 }

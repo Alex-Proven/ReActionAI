@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace ReActionAI.Modules.RevitChatGPT.Services
+namespace ReActionAI.Integration.Revit.Services
 {
     public interface IChatClient
     {

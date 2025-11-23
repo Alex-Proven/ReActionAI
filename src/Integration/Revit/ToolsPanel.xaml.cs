@@ -1,21 +1,21 @@
 using System.Windows.Controls;
 
-namespace ReActionAI.Views
+namespace ReActionAI.Integration.Revit.UI
 {
-    public partial class AssistantPanel : UserControl
+    public partial class ToolsPanel : UserControl
     {
-        public AssistantPanel()
+        public ToolsPanel()
         {
             InitializeComponent();
 
             // Заголовок — через перенос по слогам
             HeaderTitle.Text =
-                ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(
+                ReActionAI.Integration.Revit.Text.RussianHyphenator.Hyphenate(
                     "ReActionAI — когнитивный ассистент для BIM-проектирования");
 
             // Описание — тоже через Hyphenator (чуть укороченный текст)
             HeaderDescription.Text =
-                ReActionAI.Modules.RevitChatGPT.Text.RussianHyphenator.Hyphenate(
+                ReActionAI.Integration.Revit.Text.RussianHyphenator.Hyphenate(
                     "Поддержка проектных решений, оптимизация процессов и повышение эффективности работы инженера.");
         }
     }
