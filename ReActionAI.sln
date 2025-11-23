@@ -3,11 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReActionAI", "src\ReActionAI\ReActionAI.csproj", "{11111111-1111-1111-1111-111111111111}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReActionAI.Tests", "tests\ReActionAI.Tests\ReActionAI.Tests.csproj", "{22222222-2222-2222-2222-222222222222}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RePackAI", "src\RePackAI\RePackAI.fsproj", "{7293B649-FADF-8452-07F8-273771482EC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReActionAI.Core", "src\ReActionAI\ReActionAI.Core.csproj", "{11111111-1111-1111-1111-111111111111}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{754FC069-D67B-A9D7-50A1-8D1CA196D8F1}"
 	ProjectSection(SolutionItems) = preProject
@@ -16,10 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решен
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReActionAI.Abstractions", "src\Abstractions\ReActionAI.Abstractions\ReActionAI.Abstractions.csproj", "{8C37573C-2FFE-B97E-47C6-135EF53CCBC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReActionAI.Modules.RevitChatGPT", "src\Modules\RevitChatGPT\ReActionAI.Modules.RevitChatGPT.csproj", "{B08EF68B-CB8D-6135-6697-444A2227F57C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8C37573C-2FFE-B97E-47C6-135EF53CCBC8} = {8C37573C-2FFE-B97E-47C6-135EF53CCBC8}
-	EndProjectSection
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ReActionAI.Tools.RePack", "src\RePackAI.Tools.RePack\ReActionAI.Tools.RePack.fsproj", "{28AC8DC9-B0BF-2C76-2BCC-6C99F5148724}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReActionAI.Integration.Revit", "src\Integration\Revit\ReActionAI.Integration.Revit.csproj", "{8082F6EB-2C65-3EB8-34DB-D2DE46E21873}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,30 +29,24 @@ Global
 		{11111111-1111-1111-1111-111111111111}.Debug|x64.Build.0 = Debug|x64
 		{11111111-1111-1111-1111-111111111111}.Release|x64.ActiveCfg = Release|x64
 		{11111111-1111-1111-1111-111111111111}.Release|x64.Build.0 = Release|x64
-		{22222222-2222-2222-2222-222222222222}.AllConfig|x64.ActiveCfg = Debug|x64
-		{22222222-2222-2222-2222-222222222222}.AllConfig|x64.Build.0 = Debug|x64
-		{22222222-2222-2222-2222-222222222222}.Debug|x64.ActiveCfg = Debug|x64
-		{22222222-2222-2222-2222-222222222222}.Debug|x64.Build.0 = Debug|x64
-		{22222222-2222-2222-2222-222222222222}.Release|x64.ActiveCfg = Release|x64
-		{22222222-2222-2222-2222-222222222222}.Release|x64.Build.0 = Release|x64
-		{7293B649-FADF-8452-07F8-273771482EC1}.AllConfig|x64.ActiveCfg = Debug|x64
-		{7293B649-FADF-8452-07F8-273771482EC1}.AllConfig|x64.Build.0 = Debug|x64
-		{7293B649-FADF-8452-07F8-273771482EC1}.Debug|x64.ActiveCfg = Debug|x64
-		{7293B649-FADF-8452-07F8-273771482EC1}.Debug|x64.Build.0 = Debug|x64
-		{7293B649-FADF-8452-07F8-273771482EC1}.Release|x64.ActiveCfg = Release|x64
-		{7293B649-FADF-8452-07F8-273771482EC1}.Release|x64.Build.0 = Release|x64
 		{8C37573C-2FFE-B97E-47C6-135EF53CCBC8}.AllConfig|x64.ActiveCfg = Debug|x64
 		{8C37573C-2FFE-B97E-47C6-135EF53CCBC8}.AllConfig|x64.Build.0 = Debug|x64
 		{8C37573C-2FFE-B97E-47C6-135EF53CCBC8}.Debug|x64.ActiveCfg = Debug|x64
 		{8C37573C-2FFE-B97E-47C6-135EF53CCBC8}.Debug|x64.Build.0 = Debug|x64
 		{8C37573C-2FFE-B97E-47C6-135EF53CCBC8}.Release|x64.ActiveCfg = Release|x64
 		{8C37573C-2FFE-B97E-47C6-135EF53CCBC8}.Release|x64.Build.0 = Release|x64
-		{B08EF68B-CB8D-6135-6697-444A2227F57C}.AllConfig|x64.ActiveCfg = Debug|x64
-		{B08EF68B-CB8D-6135-6697-444A2227F57C}.AllConfig|x64.Build.0 = Debug|x64
-		{B08EF68B-CB8D-6135-6697-444A2227F57C}.Debug|x64.ActiveCfg = Debug|x64
-		{B08EF68B-CB8D-6135-6697-444A2227F57C}.Debug|x64.Build.0 = Debug|x64
-		{B08EF68B-CB8D-6135-6697-444A2227F57C}.Release|x64.ActiveCfg = Release|x64
-		{B08EF68B-CB8D-6135-6697-444A2227F57C}.Release|x64.Build.0 = Release|x64
+		{28AC8DC9-B0BF-2C76-2BCC-6C99F5148724}.AllConfig|x64.ActiveCfg = Debug|x64
+		{28AC8DC9-B0BF-2C76-2BCC-6C99F5148724}.AllConfig|x64.Build.0 = Debug|x64
+		{28AC8DC9-B0BF-2C76-2BCC-6C99F5148724}.Debug|x64.ActiveCfg = Debug|x64
+		{28AC8DC9-B0BF-2C76-2BCC-6C99F5148724}.Debug|x64.Build.0 = Debug|x64
+		{28AC8DC9-B0BF-2C76-2BCC-6C99F5148724}.Release|x64.ActiveCfg = Release|x64
+		{28AC8DC9-B0BF-2C76-2BCC-6C99F5148724}.Release|x64.Build.0 = Release|x64
+		{8082F6EB-2C65-3EB8-34DB-D2DE46E21873}.AllConfig|x64.ActiveCfg = Debug|x64
+		{8082F6EB-2C65-3EB8-34DB-D2DE46E21873}.AllConfig|x64.Build.0 = Debug|x64
+		{8082F6EB-2C65-3EB8-34DB-D2DE46E21873}.Debug|x64.ActiveCfg = Debug|x64
+		{8082F6EB-2C65-3EB8-34DB-D2DE46E21873}.Debug|x64.Build.0 = Debug|x64
+		{8082F6EB-2C65-3EB8-34DB-D2DE46E21873}.Release|x64.ActiveCfg = Release|x64
+		{8082F6EB-2C65-3EB8-34DB-D2DE46E21873}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

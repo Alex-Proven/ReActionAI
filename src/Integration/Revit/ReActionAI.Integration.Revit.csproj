@@ -14,7 +14,7 @@
         <!-- Важные переменные Revit -->
         <RevitYear>2024</RevitYear>
         <RevitAddinDir>$(APPDATA)\Autodesk\Revit\Addins\$(RevitYear)</RevitAddinDir>
-        <ThisModuleName>ReActionAI.Modules.RevitChatGPT</ThisModuleName>
+        <ThisModuleName>ReActionAI.Integration.Revit</ThisModuleName>
         <ThisModuleAddin>$(ProjectDir)$(ThisModuleName).addin</ThisModuleAddin>
         <ReActionAddinDir>$(RevitAddinDir)\ReActionAI</ReActionAddinDir>
     </PropertyGroup>
@@ -30,7 +30,7 @@
     <!-- Ссылки на проекты -->
     <ItemGroup>
         <ProjectReference Include="..\..\Abstractions\ReActionAI.Abstractions\ReActionAI.Abstractions.csproj" />
-        <ProjectReference Include="..\..\ReActionAI\ReActionAI.csproj" />
+        <ProjectReference Include="..\..\ReActionAI\ReActionAI.Core.csproj" />
     </ItemGroup>
 
     <!-- Ссылки на WPF -->
@@ -63,7 +63,7 @@
       </Resource>
     </ItemGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="REM === ПУТИ ===&#xD;&#xA;SET &quot;ADDIN_DIR=%25AppData%25\Autodesk\Revit\Addins\2024&quot;&#xD;&#xA;SET &quot;DEST=%25ADDIN_DIR%25\ReActionAI&quot;&#xD;&#xA;&#xD;&#xA;REM === СОЗДАЁМ ПАПКУ ДЛЯ DLL ===&#xD;&#xA;IF NOT EXIST &quot;%25DEST%25&quot; mkdir &quot;%25DEST%25&quot;&#xD;&#xA;&#xD;&#xA;REM === КОПИРУЕМ DLL ТЕКУЩЕГО МОДУЛЯ ===&#xD;&#xA;copy /Y &quot;$(TargetPath)&quot; &quot;%25DEST%25&quot;&#xD;&#xA;&#xD;&#xA;REM === КОПИРУЕМ DLL Abstractions ===&#xD;&#xA;copy /Y &quot;$(ProjectDir)..\..\Abstractions\ReActionAI.Abstractions\bin\x64\$(Configuration)\net48\ReActionAI.Abstractions.dll&quot; &quot;%25DEST%25&quot;&#xD;&#xA;&#xD;&#xA;REM === КОПИРУЕМ DLL ядра ReActionAI ===&#xD;&#xA;copy /Y &quot;$(ProjectDir)..\..\ReActionAI\bin\x64\$(Configuration)\net48\ReActionAI.dll&quot; &quot;%25DEST%25&quot;&#xD;&#xA;&#xD;&#xA;REM === КОПИРУЕМ .ADDIN В КОРЕНЬ Addins\2024 ===&#xD;&#xA;copy /Y &quot;$(ProjectDir)ReActionAI.Modules.RevitChatGPT.addin&quot; &quot;%25ADDIN_DIR%25&quot;" />
+      <Exec Command="REM === ПУТИ ===&#xD;&#xA;SET &quot;ADDIN_DIR=%25AppData%25\Autodesk\Revit\Addins\2024&quot;&#xD;&#xA;SET &quot;DEST=%25ADDIN_DIR%25\ReActionAI&quot;&#xD;&#xA;&#xD;&#xA;REM === СОЗДАЁМ ПАПКУ ДЛЯ DLL ===&#xD;&#xA;IF NOT EXIST &quot;%25DEST%25&quot; mkdir &quot;%25DEST%25&quot;&#xD;&#xA;&#xD;&#xA;REM === КОПИРУЕМ DLL ТЕКУЩЕГО МОДУЛЯ ===&#xD;&#xA;copy /Y &quot;$(TargetPath)&quot; &quot;%25DEST%25&quot;&#xD;&#xA;&#xD;&#xA;REM === КОПИРУЕМ DLL Abstractions ===&#xD;&#xA;copy /Y &quot;$(ProjectDir)..\..\Abstractions\ReActionAI.Abstractions\bin\x64\$(Configuration)\net48\ReActionAI.Abstractions.dll&quot; &quot;%25DEST%25&quot;&#xD;&#xA;&#xD;&#xA;REM === КОПИРУЕМ DLL ядра ReActionAI ===&#xD;&#xA;copy /Y &quot;$(ProjectDir)..\..\ReActionAI\bin\x64\$(Configuration)\net48\ReActionAI.dll&quot; &quot;%25DEST%25&quot;&#xD;&#xA;&#xD;&#xA;REM === КОПИРУЕМ .ADDIN В КОРЕНЬ Addins\2024 ===&#xD;&#xA;copy /Y &quot;$(ProjectDir)ReActionAI.Integration.Revit.addin&quot; &quot;%25ADDIN_DIR%25&quot;" />
     </Target>
 
 </Project>

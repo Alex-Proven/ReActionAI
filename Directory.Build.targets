@@ -1,28 +1,12 @@
 <Project>
   <PropertyGroup>
-    <!-- Папка для Revit 2024 -->
     <RevitAddinsFolder>$(APPDATA)\Autodesk\Revit\Addins\2024</RevitAddinsFolder>
   </PropertyGroup>
-
-  <!-- Копируем .addin только если проект — модуль Revit -->
-  <Target Name="DeployRevitAddin"
-          AfterTargets="Build"
-          Condition="'$(MSBuildProjectName)' == 'ReActionAI.Modules.RevitChatGPT'">
-    
+  <Target Name="DeployRevitAddin" AfterTargets="Build" Condition="'$(MSBuildProjectName)' == 'ReActionAI.Integration.Revit'">
     <ItemGroup>
-      <!-- Только .addin файл, без DLL -->
-      <AddinFile Include="$(MSBuildProjectDirectory)\ReActionAI.Modules.RevitChatGPT.addin"/>
+      <AddinFile Include="$(MSBuildProjectDirectory)\ReActionAI.Integration.Revit.addin"/>
     </ItemGroup>
-
-    <!-- Создаём папку, если её нет -->
     <MakeDir Directories="$(RevitAddinsFolder)" />
-
-    <!-- Копируем только .addin -->
-    <Copy 
-      SourceFiles="@(AddinFile)"
-      DestinationFolder="$(RevitAddinsFolder)"
-      OverwriteReadOnlyFiles="true"
-      SkipUnchangedFiles="false" />
-
+    <Copy SourceFiles="@(AddinFile)" DestinationFolder="$(RevitAddinsFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
 </Project>
