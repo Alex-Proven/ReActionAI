@@ -14,7 +14,7 @@ namespace ReActionAI.Integration.Revit.UI
     /// Панель чата ReActionAI с двумя вариантами оформления:
     /// 1) монохромный (вариант 1),
     /// 2) мягкие цветные акценты (вариант 2).
-    /// Переключение временно выполняется по кнопке "+".
+    /// Переключение временно выполняется по кнопке меню.
     /// </summary>
     public partial class ToolsPanel : UserControl
     {
@@ -145,8 +145,8 @@ namespace ReActionAI.Integration.Revit.UI
             if (SendButton != null)
                 SendButton.Click += SendButton_Click;
 
-            if (PlusButton != null)
-                PlusButton.Click += PlusButton_Click;
+            if (MenuButton != null)
+                MenuButton.Click += MenuButton_Click;
 
             UpdatePlaceholderVisibility();
             UpdateInputHeight();
@@ -174,11 +174,11 @@ namespace ReActionAI.Integration.Revit.UI
             }
         }
 
-        private void PlusButton_Click(object sender, RoutedEventArgs e)
+        private void MenuButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Временно: переключаем тему по кнопке "+"
+                // Временно: переключаем тему по кнопке меню
                 ToggleTheme();
             }
             catch
@@ -709,8 +709,8 @@ namespace ReActionAI.Integration.Revit.UI
 
             if (InputBorder != null)
                 InputBorder.BorderBrush = borderBrush;
-            if (PlusButton != null)
-                PlusButton.BorderBrush = borderBrush;
+            if (MenuButton != null)
+                MenuButton.BorderBrush = borderBrush;
             if (SendButton != null)
                 SendButton.BorderBrush = borderBrush;
 
@@ -723,8 +723,8 @@ namespace ReActionAI.Integration.Revit.UI
 
                 if (InputBorder != null)
                     InputBorder.Background = new SolidColorBrush(Color.FromRgb(50, 50, 50));
-                if (PlusButton != null)
-                    PlusButton.Background = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+                if (MenuButton != null)
+                    MenuButton.Background = new SolidColorBrush(Color.FromRgb(45, 45, 45));
                 if (SendButton != null)
                     SendButton.Background = Brushes.White;
 
@@ -740,8 +740,8 @@ namespace ReActionAI.Integration.Revit.UI
 
                 if (InputBorder != null)
                     InputBorder.Background = Brushes.White;
-                if (PlusButton != null)
-                    PlusButton.Background = new SolidColorBrush(Color.FromRgb(242, 242, 242));
+                if (MenuButton != null)
+                    MenuButton.Background = new SolidColorBrush(Color.FromRgb(242, 242, 242));
                 if (SendButton != null)
                     SendButton.Background = new SolidColorBrush(Color.FromRgb(242, 242, 242));
 
