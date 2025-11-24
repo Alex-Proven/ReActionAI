@@ -174,14 +174,76 @@ namespace ReActionAI.Integration.Revit.UI
             }
         }
 
+        private const double AnimationMs = 180.0;
+
         private void MenuButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Переключаем видимость бокового меню (ищем элемент по имени, чтобы не зависеть от сгенерированного поля)
-                if (this.FindName("SideToolsMenu") is FrameworkElement menu)
+                // host Border that contains the ToolsMenu (overlay)
+                var host = this.FindName("SideToolsMenuHost") as FrameworkElement;
+                if (host == null)
+                    return;
+
+                // Try to obtain TranslateTransform from host.RenderTransform or resources
+                TranslateTransform tt = host.RenderTransform as TranslateTransform;
+                if (tt == null)
                 {
-                    menu.Visibility = menu.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                    var res = TryFindResource("SideMenuTranslateTransform") as TranslateTransform;
+                    if (res != null)
+                        tt = res;
+                    else
+                    {
+                        tt = new TranslateTransform();
+                        host.RenderTransform = tt;
+                    }
+                }
+
+                double menuWidth = host.Width;
+                if (double.IsNaN(menuWidth) || menuWidth <= 0)
+                {
+                    if (host.ActualWidth > 0)
+                        menuWidth = host.ActualWidth;
+                    else
+                        menuWidth = 200.0;
+                }
+
+                if (host.Visibility != Visibility.Visible)
+                {
+                    // show animated
+                    host.Visibility = Visibility.Visible;
+                    tt.X = -menuWidth;
+
+                    var anim = new DoubleAnimation(-menuWidth, 0, TimeSpan.FromMilliseconds(AnimationMs))
+                    {
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+
+                    tt.BeginAnimation(TranslateTransform.XProperty, anim);
+
+                    var opacityAnim = new DoubleAnimation(0.0, 1.0, TimeSpan.FromMilliseconds(AnimationMs));
+                    host.BeginAnimation(UIElement.OpacityProperty, opacityAnim);
+                }
+                else
+                {
+                    // hide animated
+                    var anim = new DoubleAnimation(tt.X, -menuWidth, TimeSpan.FromMilliseconds(AnimationMs))
+                    {
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+                    };
+
+                    anim.Completed += (s, ev) =>
+                    {
+                        try
+                        {
+                            host.Visibility = Visibility.Collapsed;
+                        }
+                        catch { }
+                    };
+
+                    tt.BeginAnimation(TranslateTransform.XProperty, anim);
+                    var opacityAnim = new DoubleAnimation(1.0, 0.0, TimeSpan.FromMilliseconds(AnimationMs));
+                    host.BeginAnimation(UIElement.OpacityProperty, opacityAnim);
                 }
             }
             catch

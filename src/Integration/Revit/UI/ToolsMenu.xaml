@@ -17,7 +17,7 @@
             <!-- Подменю настроек -->
             <StackPanel x:Name="SettingsSubmenu" Visibility="Collapsed" Margin="8,0,0,0">
                 <Button x:Name="SettingOption1" Content="Интерфейс" Margin="4" HorizontalAlignment="Stretch"/>
-                <Button x:Name="SettingOption2" Content="Интеграция" Margin="4" HorizontalAlignment="Stretch"/>
+                <Button x:Name="SettingOption2" Content="Звук" Margin="4" HorizontalAlignment="Stretch"/>
                 <Button x:Name="SettingOption3" Content="Дополнительно" Margin="4" HorizontalAlignment="Stretch"/>
             </StackPanel>
 

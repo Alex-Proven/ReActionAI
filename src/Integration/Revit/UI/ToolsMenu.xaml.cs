@@ -29,7 +29,7 @@ namespace ReActionAI.Integration.Revit.UI
 
             // Подменю опции
             SettingOption1.Click += (s, e) => MessageBox.Show("Тема");
-            SettingOption2.Click += (s, e) => MessageBox.Show("Интеграция");
+            SettingOption2.Click += (s, e) => MessageBox.Show("Звук");
             SettingOption3.Click += (s, e) => MessageBox.Show("Дополнительно");
         }
     }

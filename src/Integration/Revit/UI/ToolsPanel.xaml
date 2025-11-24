@@ -46,6 +46,9 @@
             <Setter Property="Width" Value="24"/>
             <Setter Property="Height" Value="24"/>
         </Style>
+
+        <!-- TranslateTransform resource for side menu animation; declared in parent namescope so code-behind can access it -->
+        <TranslateTransform x:Key="SideMenuTranslateTransform" X="0" />
     </UserControl.Resources>
 
     <!-- Корень: футер докается вниз, контент занимает всё остальное -->
@@ -122,16 +125,10 @@
             </Grid>
         </Border>
 
-        <!-- MAIN AREA: боковое меню слева и сообщения -->
+        <!-- MAIN AREA: overlay - content stays full-width, menu overlays on top -->
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <local:ToolsMenu x:Name="SideToolsMenu" Grid.Column="0" Visibility="Collapsed"/>
-
-            <Border Grid.Column="1" Margin="12,8,12,8" Background="White" CornerRadius="12" BorderBrush="#E0E0E0" BorderThickness="1">
+            <!-- base layer: content panel occupies full available width and does not change size when menu appears -->
+            <Border x:Name="ContentBorder" Grid.ZIndex="0" Margin="12,8,12,8" Background="White" CornerRadius="12" BorderBrush="#E0E0E0" BorderThickness="1">
                 <ScrollViewer x:Name="MessagesScrollViewer" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel x:Name="MessagesPanel" Margin="12,8,12,8" Orientation="Vertical" VerticalAlignment="Top">
                         <StackPanel.Resources>
@@ -143,6 +140,14 @@
                         </StackPanel.Resources>
                     </StackPanel>
                 </ScrollViewer>
+            </Border>
+
+            <!-- overlay layer: side menu positioned over content, fixed width, does not affect layout -->
+            <Border Panel.ZIndex="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="200" Background="Transparent" Visibility="Collapsed" x:Name="SideToolsMenuHost">
+                <Border.RenderTransform>
+                    <StaticResource ResourceKey="SideMenuTranslateTransform" />
+                </Border.RenderTransform>
+                <local:ToolsMenu Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" />
             </Border>
         </Grid>
     </DockPanel>
