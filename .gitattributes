@@ -1,1 +1,7 @@
-*.cs text eol=crlf
+# Build artifacts
+**/bin/
+**/obj/
+.vs/
+
+# Secrets
+**/Config/appsettings.json
