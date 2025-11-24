@@ -3,7 +3,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-namespace ReActionAI.Modules.RevitChatGPT.Commands
+namespace ReActionAI.Integration.Revit.Commands
 {
     /// <summary>
     /// Заглушка команды "Pack Project".

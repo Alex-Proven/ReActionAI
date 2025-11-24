@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ReActionAI.Modules.RevitChatGPT.Text
+namespace ReActionAI.Integration.Revit.Text
 {
     /// <summary>
     /// Простой русский перенос слов для WPF без внешних библиотек.

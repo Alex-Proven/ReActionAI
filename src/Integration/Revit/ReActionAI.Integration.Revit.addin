@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>ReActionAI</Name>
+    <Assembly>ReActionAI\ReActionAI.Integration.Revit.dll</Assembly>
+    <AddInId>6E12C980-A9AF-4A47-BC16-4DB71AAC31C1</AddInId>
+    <FullClassName>ReActionAI.Integration.Revit.App</FullClassName>
+    <VendorId>RAAI</VendorId>
+    <VendorDescription>ReActionAI</VendorDescription>
+  </AddIn>
+</RevitAddIns>

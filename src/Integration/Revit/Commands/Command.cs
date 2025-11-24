@@ -3,7 +3,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-namespace ReActionAI.Modules.RevitChatGPT.Commands
+namespace ReActionAI.Integration.Revit.Commands
 {
     [Transaction(TransactionMode.Manual)]
     public class Command : IExternalCommand
