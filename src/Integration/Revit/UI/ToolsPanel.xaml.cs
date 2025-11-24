@@ -7,6 +7,9 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Documents;
+using System.Media;
+using System.IO;
+using System.Reflection;
 
 namespace ReActionAI.Integration.Revit.UI
 {
@@ -251,7 +254,61 @@ namespace ReActionAI.Integration.Revit.UI
             }
         }
 
-        private void SendButton_Click(object sender, RoutedEventArgs e) => SendMessageSafe();
+        private void SendButton_Click(object sender, RoutedEventArgs e)
+        {
+            PlaySendSound();
+            SendMessageSafe();
+        }
+
+        private void PlaySendSound()
+        {
+            try
+            {
+                // 1) Try to load from pack URI (WPF Resource)
+                try
+                {
+                    var uri = new Uri("pack://application:,,,/ReActionAI.Integration.Revit;component/Resources/send_click.wav", UriKind.Absolute);
+                    var sri = Application.GetResourceStream(uri);
+                    if (sri != null)
+                    {
+                        using (var player = new SoundPlayer(sri.Stream))
+                        {
+                            player.Play();
+                        }
+                        return;
+                    }
+                }
+                catch
+                {
+                    // ignore and try filesystem
+                }
+
+                // 2) Try file in output directory (Resources subfolder)
+                string baseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? AppDomain.CurrentDomain.BaseDirectory;
+                string[] candidates = new[]
+                {
+                    Path.Combine(baseDir, "Resources", "send_click.wav"),
+                    Path.Combine(baseDir, "send_click.wav"),
+                    Path.Combine(baseDir, "..", "Resources", "send_click.wav")
+                };
+
+                foreach (var file in candidates)
+                {
+                    if (File.Exists(file))
+                    {
+                        using (var player = new SoundPlayer(file))
+                        {
+                            player.Play();
+                        }
+                        return;
+                    }
+                }
+            }
+            catch
+            {
+                // silently ignore sound errors to avoid affecting Revit
+            }
+        }
 
         private void SendMessageSafe()
         {
