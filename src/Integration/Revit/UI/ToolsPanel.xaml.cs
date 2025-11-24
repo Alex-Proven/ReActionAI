@@ -178,8 +178,11 @@ namespace ReActionAI.Integration.Revit.UI
         {
             try
             {
-                // Временно: переключаем тему по кнопке меню
-                ToggleTheme();
+                // Переключаем видимость бокового меню (ищем элемент по имени, чтобы не зависеть от сгенерированного поля)
+                if (this.FindName("SideToolsMenu") is FrameworkElement menu)
+                {
+                    menu.Visibility = menu.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                }
             }
             catch
             {

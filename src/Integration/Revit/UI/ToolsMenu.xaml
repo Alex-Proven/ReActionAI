@@ -1,0 +1,36 @@
+<UserControl x:Class="ReActionAI.Integration.Revit.UI.ToolsMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Width="200"
+             Background="Transparent">
+
+    <Border Background="White" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1" Padding="8">
+        <StackPanel Orientation="Vertical" MinWidth="160">
+            <TextBlock Text="Меню" FontWeight="Bold" Margin="4"/>
+            <Separator Margin="4,6"/>
+
+            <Button x:Name="MenuItem1" Content="Общие настройки" Margin="4" HorizontalAlignment="Stretch"/>
+
+            <!-- Подменю настроек -->
+            <StackPanel x:Name="SettingsSubmenu" Visibility="Collapsed" Margin="8,0,0,0">
+                <Button x:Name="SettingOption1" Content="Интерфейс" Margin="4" HorizontalAlignment="Stretch"/>
+                <Button x:Name="SettingOption2" Content="Интеграция" Margin="4" HorizontalAlignment="Stretch"/>
+                <Button x:Name="SettingOption3" Content="Дополнительно" Margin="4" HorizontalAlignment="Stretch"/>
+            </StackPanel>
+
+            <Button x:Name="MenuItem2" Content="Пункт 2" Margin="4" HorizontalAlignment="Stretch"/>
+            <Button x:Name="MenuItem3" Content="Пункт 3" Margin="4" HorizontalAlignment="Stretch"/>
+
+            <Button x:Name="MenuItem4" Content="Доп. пункт 1" Margin="4" HorizontalAlignment="Stretch"/>
+            <Button x:Name="MenuItem5" Content="Доп. пункт 2" Margin="4" HorizontalAlignment="Stretch"/>
+            <Button x:Name="MenuItem6" Content="Доп. пункт 3" Margin="4" HorizontalAlignment="Stretch"/>
+
+            <Separator Margin="4,6"/>
+            <Button x:Name="MenuClose" Content="Профиль" Margin="4" HorizontalAlignment="Stretch"/>
+        </StackPanel>
+    </Border>
+
+</UserControl>

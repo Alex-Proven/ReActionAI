@@ -4,6 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:ReActionAI.Integration.Revit.UI"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="400"
@@ -121,20 +122,29 @@
             </Grid>
         </Border>
 
-        <!-- СООБЩЕНИЯ -->
-        <Border Margin="12,8,12,8" Background="White" CornerRadius="12" BorderBrush="#E0E0E0" BorderThickness="1">
-            <ScrollViewer x:Name="MessagesScrollViewer" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-                <StackPanel x:Name="MessagesPanel" Margin="12,8,12,8" Orientation="Vertical" VerticalAlignment="Top">
-                    <StackPanel.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextWrapping" Value="Wrap"/>
-                            <Setter Property="TextAlignment" Value="Justify"/>
-                            <Setter Property="IsHyphenationEnabled" Value="True"/>
-                        </Style>
-                    </StackPanel.Resources>
-                </StackPanel>
-            </ScrollViewer>
-        </Border>
+        <!-- MAIN AREA: боковое меню слева и сообщения -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <local:ToolsMenu x:Name="SideToolsMenu" Grid.Column="0" Visibility="Collapsed"/>
+
+            <Border Grid.Column="1" Margin="12,8,12,8" Background="White" CornerRadius="12" BorderBrush="#E0E0E0" BorderThickness="1">
+                <ScrollViewer x:Name="MessagesScrollViewer" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="MessagesPanel" Margin="12,8,12,8" Orientation="Vertical" VerticalAlignment="Top">
+                        <StackPanel.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap"/>
+                                <Setter Property="TextAlignment" Value="Justify"/>
+                                <Setter Property="IsHyphenationEnabled" Value="True"/>
+                            </Style>
+                        </StackPanel.Resources>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
     </DockPanel>
 </UserControl>
 
