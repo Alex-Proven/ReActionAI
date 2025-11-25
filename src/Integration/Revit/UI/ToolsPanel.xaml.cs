@@ -10,6 +10,9 @@ using System.Windows.Documents;
 using System.Media;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
+using System.Windows.Media;
+using System.Threading.Tasks;
 
 namespace ReActionAI.Integration.Revit.UI
 {
@@ -271,22 +274,28 @@ namespace ReActionAI.Integration.Revit.UI
                     var sri = Application.GetResourceStream(uri);
                     if (sri != null)
                     {
+                        Debug.WriteLine("PlaySendSound: using pack URI resource");
                         using (var player = new SoundPlayer(sri.Stream))
                         {
                             player.Play();
                         }
                         return;
                     }
+                    Debug.WriteLine("PlaySendSound: pack URI resource not found");
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // ignore and try filesystem
+                    Debug.WriteLine("PlaySendSound: pack URI error: " + ex.Message);
                 }
 
-                // 2) Try file in output directory (Resources subfolder)
+                // 2) Filesystem candidates (including Addins folder where PostBuild copies the file)
                 string baseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? AppDomain.CurrentDomain.BaseDirectory;
+                string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string addinCandidate = Path.Combine(appData, "Autodesk", "Revit", "Addins", "2024", "ReActionAI", "send_click.wav");
+
                 string[] candidates = new[]
                 {
+                    addinCandidate,
                     Path.Combine(baseDir, "Resources", "send_click.wav"),
                     Path.Combine(baseDir, "send_click.wav"),
                     Path.Combine(baseDir, "..", "Resources", "send_click.wav")
@@ -294,19 +303,74 @@ namespace ReActionAI.Integration.Revit.UI
 
                 foreach (var file in candidates)
                 {
-                    if (File.Exists(file))
+                    try
                     {
-                        using (var player = new SoundPlayer(file))
+                        Debug.WriteLine("PlaySendSound: checking " + file);
+                        if (File.Exists(file))
                         {
-                            player.Play();
+                            Debug.WriteLine("PlaySendSound: found file " + file);
+
+                            // Try MediaPlayer first (works on UI thread)
+                            try
+                            {
+                                var tcs = new TaskCompletionSource<bool>();
+                                var mp = new MediaPlayer();
+                                mp.Open(new Uri(file));
+                                mp.Volume = 1.0;
+                                mp.MediaEnded += (s, e) =>
+                                {
+                                    try { mp.Close(); } catch { }
+                                    tcs.TrySetResult(true);
+                                };
+                                mp.MediaFailed += (s, e) =>
+                                {
+                                    Debug.WriteLine("PlaySendSound: MediaPlayer failed: " + e.ErrorException?.Message);
+                                    try { mp.Close(); } catch { }
+                                    tcs.TrySetResult(false);
+                                };
+
+                                // Play asynchronously without blocking UI
+                                mp.Play();
+
+                                // don't await - fire and forget, but schedule a short timeout to close if needed
+                                Task.Delay(1200).ContinueWith(_ =>
+                                {
+                                    try { mp.Close(); } catch { }
+                                });
+
+                                return;
+                            }
+                            catch (Exception mex)
+                            {
+                                Debug.WriteLine("PlaySendSound: MediaPlayer exception: " + mex.Message);
+                            }
+
+                            // Fallback to SoundPlayer
+                            try
+                            {
+                                using (var player = new SoundPlayer(file))
+                                {
+                                    player.Play();
+                                }
+                                return;
+                            }
+                            catch (Exception spEx)
+                            {
+                                Debug.WriteLine("PlaySendSound: SoundPlayer exception: " + spEx.Message);
+                            }
                         }
-                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("PlaySendSound: candidate check error: " + ex.Message);
                     }
                 }
+
+                Debug.WriteLine("PlaySendSound: no candidate found");
             }
-            catch
+            catch (Exception ex)
             {
-                // silently ignore sound errors to avoid affecting Revit
+                Debug.WriteLine("PlaySendSound: unexpected error: " + ex.Message);
             }
         }
 
